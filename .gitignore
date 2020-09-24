@@ -5,4 +5,7 @@ model-outputs
 *.txt
 *.tsv
 *.png
+*.jpg
 *.jpeg
+notebooks
+*.ipynb_checkpoints'
