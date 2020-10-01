@@ -39,24 +39,32 @@ class BoundingGoogle(BoundingDefault):
         text,bounding,response= self._detect_document(path) 
         print(self._cache)
         if self._should_cache:
-            print("GREAT")
+            
             self._cache.append([{"path":path,"response":response}])
         
       
         return {"text":text,"vertices":bounding}
     
     
+    def predict_byte(self,bytestream):
+        """exception for using google api"""
+        text,bounding,response= self._detect_document_bytes(bytestream) 
+        
+        if self._should_cache:
+            
+            self._cache.append([{"path":"bytestream","response":response}])
+        
+      
+        return {"text":text,"vertices":bounding}
+        
+        
     
-    def _detect_document(self,path):
-        """Detects document features in an image."""
+    def _detect_document_bytes(self,img_bytestream):
+        client =self.client
+        content=img_bytestream.read()
+        image  = vision.Image(content=content)
 
-        client = vision.ImageAnnotatorClient()
-
-        with io.open(path, 'rb') as image_file:
-            content = image_file.read()
-
-        image = vision.types.Image(content=content)
-
+        print(type(image))
         response = client.document_text_detection(image=image)
 
 
@@ -98,6 +106,17 @@ class BoundingGoogle(BoundingDefault):
                 'https://cloud.google.com/apis/design/errors'.format(
                     response.error.message))
         return all_words,bounding_boxes,response
+    
+    
+    def _detect_document(self,path):
+        """Detects document features in an image."""
+
+        
+        content = None
+        with io.open(path, 'rb') as image_file:
+            content = image_file
+            return self._detect_document_bytes(content)
+       
     
     def _detect_text(self,path:str, lang="ja"):
         """Detects text in the file
