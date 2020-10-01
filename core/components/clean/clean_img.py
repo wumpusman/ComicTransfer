@@ -6,7 +6,6 @@ class CleanDefault():
     def __init__(self):
         pass
     
-    
     def clean(self,image_cv:np.array,bounding_boxes:[]=None,mask:np.array=None):
         """ literally add white space into the bounding boxes, super naive
         """
@@ -22,7 +21,7 @@ class CleanDefault():
         return image_cv
     
     
-    def overlay_color(self,image_cv:np.array,bounding_boxes:[]=None):
+    def overlay_color(self,image_cv:np.array,bounding_boxes:[]):
         """ overlay color in one channel to highlight text, 
         """
         for bounding in bounding_boxes:

@@ -1,9 +1,9 @@
 import sys
 import os
 sys.path.append("../../..")
-from traditional_feature_prediction import FeaturePredictionTraditional
+from core.training.feature_engineering.traditional_feature_prediction import FeaturePredictionTraditional
 from core.datahandling.process_bilingual_data import Preprocess_Bilingual
-
+from core.training.feature_engineering import traditional_feature_prediction
 import pandas as pd
 from sklearn.model_selection import ShuffleSplit
 from sklearn.metrics import mean_squared_error
@@ -209,9 +209,9 @@ if __name__ == '__main__':
     aggregated=process.aggregate_to_pandas([box_area,box_location,text_info])
     x_names: list = ["width_jp", "height_jp", "text_jp_len"]
 
-    box_area = process.extract_box_area(True)
-    box_location = process.extract_box_location(True)
-    box_coords = process.to_box_coords(True)
+    box_area = process.extract_box_area(False)
+    box_location = process.extract_box_location(False)
+    box_coords = process.to_box_coords(False)
     text_info = process.extract_text_length()
     font_size = process.extract_font_size()
     
@@ -227,9 +227,10 @@ if __name__ == '__main__':
     p.set_data(aggregated)
     p.set_features()
     
+    print(aggregated.columns)
     print(p.score_cv())
     
-    x_names = ["x1_jp","y1_jp","x2_jp","y2_jp","top_jp", "left_jp", "width_jp", "height_jp","text_jp_len","font-size_jp"] #,"y21","y22","x22","x12"]
+    x_names = ["x1_jp","y1_jp","x2_jp","y2_jp","top_jp", "left_jp", "width_jp", "height_jp","text_jp_len"] #,"y21","y22","x22","x12"]
     y_names = ['x1_en', 'y1_en', 'x2_en', 'y2_en']
 
     #x_names =['x1_jp', 'y1_jp', 'x2_jp', 'y2_jp']#  ["y21", "y22", "x22", "x12", "x1_jp", "y1_jp", "x2_jp", "y2_jp", "top_jp", "left_jp", "width_jp",
@@ -261,9 +262,13 @@ if __name__ == '__main__':
     multra = MultiOutputRegressor(rf)
     b.set_model(multra)
     b.set_features(x_names)#,y_names) #y_names)
-    
-    
-    
     print(b.score_cv())
+    
+    traditional_feature_prediction.save(b,"temp2.pkl")
+
+    model2=traditional_feature_prediction.load("temp2.pkl")
+    
+    print(b.predict(b._x,preprocess=True)[0])
+    print(model2.predict(b._x,preprocess=True)[0])
     print("OK")
     

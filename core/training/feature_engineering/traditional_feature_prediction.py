@@ -9,6 +9,8 @@ from sklearn.model_selection import ShuffleSplit
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
+import joblib
+
 
 class FeaturePredictionTraditional():
 
@@ -18,6 +20,8 @@ class FeaturePredictionTraditional():
         self._scale=StandardScaler()
         self._x=None
         self._y=None
+        self._x_names=None 
+        self._y_names=None #helpful for deciphering what's going on in terms of last iteration
         self._raw_data=None #base
 
 
@@ -45,6 +49,8 @@ class FeaturePredictionTraditional():
         self._x=self._raw_data[x_names].values
 
         self._y=self._raw_data[y_names].values
+        self._y_names=y_names
+        self._x_names=x_names
         print(self._y.shape)
         if self._y.shape[1]==1:
             self._y=self._y.ravel()
@@ -123,6 +129,39 @@ class FeaturePredictionTraditional():
         return mean_squared_error(predicted, ground_truth,squared=False)
 
 
+def save(model:FeaturePredictionTraditional, save_path: str):
+    """
+    wraps the whole file, except for the data itself
+    Args:
+        save_path: a path to save the file
+
+    Returns:
+        None
+    """
+    x=model._x
+    y=model._y
+    raw_data= model._raw_data
+
+    model._x=None
+    model._y=None
+    model._raw_data=None
+
+    joblib.dump(model,save_path)
+    model.set_data(raw_data)
+    model._x=x
+    model._y=y
+
+
+def load(load_path:str)->object:
+    """
+    loads model that is saved, useful for when incorporated into the actual system
+    Args:
+        load_path: path of the model to be loaded
+
+    Returns:
+        object
+    """
+    return joblib.load(load_path)
 
 
 if __name__ == '__main__':
@@ -193,7 +232,10 @@ if __name__ == '__main__':
     assert score_good < 4.5, "scaled data before running"
     assert score_bad > 3.5, "did not scale data before running "
 
+    save(model,"temp1.pkl")
 
+    model2=load("temp1.pkl")
+    assert ex1_results[0]==model2.predict(model._x,preprocess=True)[0]
     print("Ok")
     #bounding box normalize
     #text len jp

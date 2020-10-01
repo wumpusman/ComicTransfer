@@ -1,6 +1,6 @@
 from google.cloud import vision
 import io
-
+import pandas as pd 
 class BoundingDefault():
     
     def __init__(self,estimator=None,cache_results=False):
@@ -45,8 +45,34 @@ class BoundingGoogle(BoundingDefault):
       
         return {"text":text,"vertices":bounding}
     
+    def format_predictions(self,results:dict)->pd.DataFrame:
+        """
+        used to format predictions into a set a features that is more readible to other models
+        """
+        names=['x1_jp','y1_jp','x2_jp','y2_jp','top_jp','left_jp','width_jp',
+                   'height_jp','text_jp_len',"text_jp"]
+        
+        text=results["text"]
+        bounds=results["vertices"]
+        all_results=[]
+        for text,bound in zip(text,bounds):
+            aligned=pd.DataFrame(bound)
     
-    def predict_byte(self,bytestream):
+            xmin=aligned["x"].min()
+            xmax=aligned["x"].max()
+            ymax=aligned["y"].max()
+            ymin=aligned["y"].min()
+            width=xmax-xmin
+            height=ymax-ymin
+            all_results.append([xmin,ymin,xmax,ymax,ymin,xmin,width,height,len(text),text])
+        
+        all_results_pd=pd.DataFrame(all_results)
+        all_results_pd.columns=names
+        return all_results_pd
+
+        
+    
+    def predict_byte(self,bytestream)->dict:
         """exception for using google api"""
         text,bounding,response= self._detect_document_bytes(bytestream) 
         
