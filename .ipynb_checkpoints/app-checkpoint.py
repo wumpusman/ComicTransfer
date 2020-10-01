@@ -19,7 +19,6 @@ import io
 image_proto.MAXIMUM_CONTENT_WIDTH = 600
 image_proto.MAXIMUM_CONTENT_HEIGHT= 600
 st.set_option('deprecation.showfileUploaderEncoding', False)
-data_path = "C://Users//egasy//Downloads//ComicTransfer//ComicTransfer//ExtractBilingual/bi/"
 data_name = "Yaiba_selenium.tsv" #Doraemon_Long_Stories_selenium.tsv"
 
 full_path = data_name #os.path.join(data_path, data_name)
