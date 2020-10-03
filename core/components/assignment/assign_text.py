@@ -51,9 +51,29 @@ class AssignDefault():
         """
         the simplest most heuristic way for figuring out where text is 
         """
-  
+
+    def assign_all(self,image_cv:np.array,texts:list,data:pd.DataFrame,font_path:str)->np.array:
+        image = Image.fromarray(image_cv)
+        draw = ImageDraw.Draw(image)
+        box_predictions=data[["x1_jp","y1_jp","x2_jp","y2_jp"]].values
+
+        for text,box in zip(texts,box_predictions):
+
+            xmin,ymin,xmax,ymax=box[0],box[1],box[2],box[3]
+            size=calc_font_size(xmin,xmax,ymin,xmax,text)
+
+            font = ImageFont.truetype(font_path, size)
+            realigned_text = text_wrap(text, font, xmax-xmin)
+            
+           
+            updated_font_size=calc_font_size(xmin,xmax,ymin,ymax,"\n".join(realigned_text))
+         
+            font = ImageFont.truetype(font_path,updated_font_size) 
+            draw.text([xmin,ymin],"\n".join(realigned_text),font=font,fill=(0,0,0,255))
+            
+        return np.asarray(image)
     
-    def assign_all(self,image_cv:np.array,texts:list,boundings:list,font_path:str)->np.array:
+    def assign_all1(self,image_cv:np.array,texts:list,boundings:list,font_path:str)->np.array:
         """assigns a bounding box in accordance with where the text should be """
         image= Image.fromarray(image_cv)
         draw = ImageDraw.Draw(image) 
@@ -68,10 +88,11 @@ class AssignDefault():
 
             size=calc_font_size(xmin,xmax,ymin,xmax,text)
             font = ImageFont.truetype(font_path, size)
-
+            
 
             realigned_text=text_wrap(text,font,xmax-xmin)
             updated_font_size=calc_font_size(xmin,xmax,ymin,ymax,"\n".join(realigned_text))
+            print(updated_font_size)
             font = ImageFont.truetype(font_path,updated_font_size) 
             draw.text(aligned.values[0],"\n".join(realigned_text),font=font,fill=(0,0,0,255))
         

@@ -9,8 +9,11 @@ import io
 import PIL.Image as Image
 from core.components.alignment import predictor_bounding
 from core.components.translation import predictor_translate
+from core.training.feature_engineering.traditional_feature_prediction import FeaturePredictionTraditional
+from core.training.feature_engineering.iou_prediction import PredictionBoundingTraditional
 from core.components.clean import clean_img
 from core.components.assignment import assign_text
+from core.components.assignment import assign_ml
 from streamlit.elements import image_proto
 
 from google.cloud import vision
@@ -28,8 +31,8 @@ all_manga = pd.read_csv(full_path, sep="\t", index_col=0)
 #st.write(len(all_manga))
 all_manga = all_manga.drop(columns=["level_0"])
 
-app_mode = st.sidebar.selectbox("Choose the data mode",
-        ["Japanese", "English"])
+app_mode = st.sidebar.selectbox("Choose the model",
+        ["Naive", "Model-Ensemble"])
 
 
 st.title("Manga Translate")
@@ -44,8 +47,10 @@ uploaded_file = st.file_uploader("")
 bounder_google=predictor_bounding.BoundingGoogle(True) 
 text_translation=predictor_translate.TranslationGoogle("typegan")
 cleaning_obj=clean_img.CleanDefault()
-text_image_assignment=assign_text.AssignDefault()
 
+
+text_image_assignment=assign_text.AssignDefault() #assign_ml.load_default_model()
+text_image_assignment2=assign_ml.load_default_model()
 
 if type(uploaded_file)!=type(None):
     
@@ -57,6 +62,7 @@ if type(uploaded_file)!=type(None):
   
     
     results=bounder_google.predict_byte(uploaded_file)
+    results_structured=bounder_google.format_predictions(results)
     text_estimates=text_translation.predict(results["text"])
     
     display_trans=pd.DataFrame()
@@ -75,12 +81,15 @@ if type(uploaded_file)!=type(None):
     
     
     
-    st.image(Image.fromarray(cleaned_image))
+    #st.image(Image.fromarray(cleaned_image))
     
     
     font_path='/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf'
-    result_image=text_image_assignment.assign_all(cleaned_image,text_estimates,results["vertices"],font_path)
-    
+    result_image=None
+    if app_mode =="Naive":
+        result_image=text_image_assignment.assign_all(cleaned_image,text_estimates,results_structured,font_path)
+    if app_mode =="Model-Ensemble":
+        result_image=text_image_assignment2.assign_all(cleaned_image,text_estimates,results_structured,font_path)
     st.image(Image.fromarray(result_image))
     image_mod=np.copy(np.asarray(numpy_version))
 
