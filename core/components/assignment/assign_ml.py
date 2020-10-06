@@ -26,6 +26,7 @@ class AssignTextML(assign_text.AssignDefault):
     
     
     def assign_all(self,image_cv:np.array,texts:list,data:pd.DataFrame,font_path:str)->np.array:
+        self._estimated_sizes=[]
         image = Image.fromarray(image_cv)
         draw = ImageDraw.Draw(image)
         font_sizes_pred:list=self._model_font_size.predict(data[self._model_font_size._x_names],True).astype(int)
@@ -40,6 +41,7 @@ class AssignTextML(assign_text.AssignDefault):
             updated_font_size = assign_text.calc_font_size(xmin, xmax, ymin, ymax, "\n".join(realigned_text))
 
             updated_font_size=int((font_size*.5+updated_font_size*.5))
+            self._estimated_sizes.append(updated_font_size)
             font = ImageFont.truetype(font_path, updated_font_size)
             draw.text([xmin+3,ymin], "\n".join(realigned_text), font=font, fill=(0, 0, 0, 255))
 
@@ -48,7 +50,7 @@ class AssignTextML(assign_text.AssignDefault):
 
 def load_default_model(model_font_pth="core/training/feature_engineering/temp1.pkl",
                        model_box_pth="core/training/feature_engineering/temp2.pkl"):
-    print(model_font_pth)
+
 
     m1=traditional_feature_prediction.load((model_font_pth))
     m2=traditional_feature_prediction.load((model_box_pth))

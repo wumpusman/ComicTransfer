@@ -1,5 +1,29 @@
 import pandas as pd
 import os
+
+from sklearn.neighbors import NearestNeighbors
+import numpy as np
+
+def read_tsv_files(paths:list):
+    """
+    aggregatees multiple selenium tsv results into a single large file
+    :param paths: path to the directory of saved results for each manga - expected as a tsv
+    :return:
+    """
+
+    all_mangas_pds:list=[]
+    for path in paths:
+        full_path = path
+
+        all_manga = pd.read_csv(full_path, sep="\t", index_col=0)
+        if len(all_manga)>0:
+            all_manga = all_manga.drop(columns=["level_0"])
+        all_mangas_pds.append(all_manga)
+
+    all_manga = pd.concat(all_mangas_pds,sort=False)
+
+    return all_manga
+
 class Preprocess_Bilingual():
     """
 
@@ -32,9 +56,46 @@ class Preprocess_Bilingual():
 
         return pd.concat(pd_form,axis=1)
 
-    def set_data(self,data:pd.DataFrame):
+    def _add_meta_information(self):
+        """gives information about nearest neighbor distance, and box info on the page
+           this expands to other features
+        :return:
+            None
         """
 
+        unique_pages = self._data_to_process.link.unique()
+        links = self._data_to_process.groupby("link")
+        all_meta = []
+        for page in unique_pages:
+            specific_page = links.get_group(page)
+            temp_process = Preprocess_Bilingual()
+            temp_process._data_to_process = specific_page.reset_index()
+
+            coords = pd.DataFrame(temp_process.to_box_coords(False))
+            if len(coords) >= 3:
+                nn = NearestNeighbors(n_neighbors=3)
+                distances = coords[["x1_jp", "y1_jp", "x2_jp", "y2_jp"]].values
+
+                nn.fit(distances)
+                distances = nn.kneighbors(distances)[0][:, 1:]
+                the_distance = pd.DataFrame(distances)
+                the_distance.columns = ["nn1", "nn2"]
+                the_distance["box_num"] = len(distances)
+                all_meta.append(the_distance)
+            else:
+                the_distance = pd.DataFrame(np.zeros((len(coords), 2)))
+                the_distance.columns = ["nn1", "nn2"]
+                the_distance["box_num"] = len(coords)
+                all_meta.append(the_distance)
+
+        additional_features=pd.concat(all_meta)
+        self._data_to_process["nn1"]=additional_features["nn1"].values
+        self._data_to_process["nn2"]=additional_features["nn2"].values
+        self._data_to_process["box_num"]=additional_features["box_num"].values
+
+    def set_data(self,data:pd.DataFrame):
+        """
+            Preps and aligns data that was scraped into even groups, and adds feature extraction
         Args:
             data: dataframe that was processed in scraping content
 
@@ -43,6 +104,7 @@ class Preprocess_Bilingual():
         """
 
         self._data_to_process= self._format_data(data)
+        self._add_meta_information()
 
     def _format_data(self,manga_pd:pd.DataFrame)->pd.DataFrame:
         """aligns and formatting japanese and english meta features from scraped data that is used for downstream analysis
@@ -101,6 +163,8 @@ class Preprocess_Bilingual():
         """
         data = self._data_to_process
         return data[["font-size_jp","font-size_en"]]
+
+
     def extract_box_location(self,normalize:bool=True)->dict:
         """
             returns 4 box pairs normalized or unnormalized relative to their size [x,y,x1,y1]
@@ -163,6 +227,8 @@ class Preprocess_Bilingual():
 
         return final_format
 
+
+
     #https://stackoverflow.com/questions/25349178/calculating-percentage-of-bounding-box-overlap-for-image-detector-evaluation
     def to_box_coords(self,normalize:bool=True)->dict:
         """
@@ -214,8 +280,15 @@ class Preprocess_Bilingual():
 
         return new.to_dict()
 
+
+
 if __name__ == '__main__':
-    data_path = "C://Users//egasy//Downloads//ComicTransfer//ComicTransfer//ExtractBilingual/bi/"
+
+
+
+
+
+    data_path = "/home/jupyter/ComicTransfer2/ComicTransfer/data/bilingual_tsv"
     data_name = "Doraemon_Long_Stories_selenium.tsv"
     full_path = os.path.join(data_path, data_name)
 
@@ -228,7 +301,7 @@ if __name__ == '__main__':
     pre_bi.set_data(all_manga)
     data = pre_bi._data_to_process
     #test one
-    assert pre_bi._data_to_process.shape == (157,40)
+    assert pre_bi._data_to_process.shape == (157,43)
 
     #test two
     temp=pre_bi.extract_text()
@@ -271,4 +344,8 @@ if __name__ == '__main__':
     #get the right bounding boxes
     temp = pre_bi.to_box_coords(False)
     assert (int(temp["x2_jp"][2]),int(temp["y2_jp"][2]))==(350,1069)
+
+
+
+    print("OK")
 

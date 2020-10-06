@@ -3,7 +3,7 @@ import cv2
 from PIL import Image, ImageFont, ImageDraw 
 import sys
 sys.path.append("../")
-from core.components.alignment import predictor_bounding
+from core.components.alignment import predict_jp_bounding
 from core.components.translation import predictor_translate
 from core.components.clean import clean_img
 from core.components.assignment import assign_text
@@ -21,7 +21,7 @@ def main(image_path:str,destination:str,font_path:str):
     """
     
     """
-    bounder_google=predictor_bounding.BoundingGoogle(True) 
+    bounder_google=predict_jp_bounding.BoundingGoogle(True)
     text_translation=predictor_translate.TranslationGoogle("typegan")
     text_image_assignment=assign_text.AssignDefault()
     cleaning_obj=clean_img.CleanDefault()

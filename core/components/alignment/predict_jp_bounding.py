@@ -11,7 +11,7 @@ class BoundingDefault():
         self._language:str="ja" #lagnauge that this model is eexpected to be bounding
         self._should_cache:bool=cache_results #am i gonna store the original unclean data 
         self._cache=[]#a temporary cache of previously stored results 
-        print("HUH")
+
     def set_language(self,name:str)->None:
         self._language=name
     
@@ -26,7 +26,7 @@ class BoundingGoogle(BoundingDefault):
     
     def __init__(self,cache_results=False):
         """
-        A wrapper for google image text bounding and ocr as a first pass
+        A wrapper for google image text bounding and ocr
         """
         super().__init__(None,cache_results)
         self.client=vision.ImageAnnotatorClient()
@@ -182,7 +182,7 @@ class BoundingGoogle(BoundingDefault):
     
     def _format_to_dictionary_words(self,google_response)->dict:
         """
-        Converts google response object to a dicitonary with relevant values for analysis
+        Converts google response object to a dictionary with relevant values for analysis
         """
         to_dict={}
         

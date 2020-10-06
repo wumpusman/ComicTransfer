@@ -51,8 +51,13 @@ class AssignDefault():
         """
         the simplest most heuristic way for figuring out where text is 
         """
+        self._estimated_sizes=[]
+
+    def get_estimate_font_size(self):
+        return self._estimated_sizes
 
     def assign_all(self,image_cv:np.array,texts:list,data:pd.DataFrame,font_path:str)->np.array:
+        self._estimated_sizes = []
         image = Image.fromarray(image_cv)
         draw = ImageDraw.Draw(image)
         box_predictions=data[["x1_jp","y1_jp","x2_jp","y2_jp"]].values
@@ -68,7 +73,8 @@ class AssignDefault():
            
             updated_font_size=calc_font_size(xmin,xmax,ymin,ymax,"\n".join(realigned_text))
          
-            font = ImageFont.truetype(font_path,updated_font_size) 
+            font = ImageFont.truetype(font_path,updated_font_size)
+            self._estimated_sizes.append(updated_font_size)
             draw.text([xmin,ymin],"\n".join(realigned_text),font=font,fill=(0,0,0,255))
             
         return np.asarray(image)

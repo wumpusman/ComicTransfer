@@ -86,11 +86,11 @@ class TrainWithFeatureChannels(TrainModel):
         predicted_y, features=self.model(x)
         print("channel shape")
         
-        #features=features.permute((1,0,2,3,4))[0]
+
         print(predicted_y.shape)
         print(y.shape)
         l1= self._loss_function(predicted_y,y)
-        #l2= self._loss_function(features,z)
+
         return l1 #+(l2/32)
     
 class TrainCoordWithUNET(TrainModel):

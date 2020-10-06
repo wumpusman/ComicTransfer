@@ -7,13 +7,14 @@ import os
 import os
 import io
 import PIL.Image as Image
-from core.components.alignment import predictor_bounding
+from core.components.alignment import predict_jp_bounding
 from core.components.translation import predictor_translate
 from core.training.feature_engineering.traditional_feature_prediction import FeaturePredictionTraditional
 from core.training.feature_engineering.iou_prediction import PredictionBoundingTraditional
 from core.components.clean import clean_img
 from core.components.assignment import assign_text
 from core.components.assignment import assign_ml
+from core.components import pipeline
 from streamlit.elements import image_proto
 
 from google.cloud import vision
@@ -36,21 +37,24 @@ app_mode = st.sidebar.selectbox("Choose the model",
 
 
 st.title("Manga Translate")
-st.markdown("-----------")
+st.markdown("------KILL ME-----")
 uploaded_file=None
 
+pipeline=pipeline.PipeComponents()
+pipeline.set_assignment_model(assign_ml.load_default_model())
 
-
-
+st.write("FUUUU")
 uploaded_file = st.file_uploader("")
 
-bounder_google=predictor_bounding.BoundingGoogle(True) 
+bounder_google=predict_jp_bounding.BoundingGoogle(True)
 text_translation=predictor_translate.TranslationGoogle("typegan")
 cleaning_obj=clean_img.CleanDefault()
 
 
 text_image_assignment=assign_text.AssignDefault() #assign_ml.load_default_model()
 text_image_assignment2=assign_ml.load_default_model()
+
+
 
 if type(uploaded_file)!=type(None):
     

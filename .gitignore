@@ -9,4 +9,6 @@ model-outputs
 *.jpg
 *.jpeg
 notebooks
-*.ipynb_checkpoints'
+*.ipynb_checkpoints
+.ipynb_checkpoints/*
+.ipynb_checkpoints/
