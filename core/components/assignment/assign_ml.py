@@ -10,8 +10,15 @@ from core.training.feature_engineering.traditional_feature_prediction import Fea
 from core.training.feature_engineering.iou_prediction import PredictionBoundingTraditional
 
 class AssignTextML(assign_text.AssignDefault):
-    
+    """
+    Attributes:
+        _model_font_size: a model for estimating font size, this is typically set via set_font_model
+        _model_location: a model for determining where to center and size the boudning box, typically set via set_location_model
+    """
     def __init__(self):
+        """
+            extension of assign ml that incorporates models for predicting bounding boxes and font size
+        """
         super().__init__()
         self._model_font_size:FeaturePredictionTraditional=None
         self._model_location:PredictionBoundingTraditional=None
@@ -19,13 +26,40 @@ class AssignTextML(assign_text.AssignDefault):
 
 
     def set_font_model(self,model):
+        """
+        sets the font model
+        Args:
+            model: model to be passed, typically FeaturePredictionTraditional
+
+        Returns:
+            None
+        """
         self._model_font_size=model
     
     def set_location_model(self,model):
+        """
+        sets the location model
+        Args:
+            model: model being passed, typicall iou_prediction
+
+        Returns:
+            None
+        """
         self._model_location=model
     
     
     def assign_all(self,image_cv:np.array,texts:list,data:pd.DataFrame,font_path:str)->np.array:
+        """
+            assigns text to bounding locations using limited heuristics
+        Args:
+            image_cv: a 3 channel numeric array representing the image
+            texts: text to be assigned to the image area
+            data: a formated dataframe with features to be used for setting bounding areas
+            font_path: a path to a font src to write text
+
+        Returns:
+            np.array
+        """
         self._estimated_sizes=[]
         image = Image.fromarray(image_cv)
         draw = ImageDraw.Draw(image)
@@ -50,7 +84,15 @@ class AssignTextML(assign_text.AssignDefault):
 
 def load_default_model(model_font_pth="core/training/feature_engineering/temp1.pkl",
                        model_box_pth="core/training/feature_engineering/temp2.pkl"):
+    """
+    function for quickly loading a model with predefined paths
+    Args:
+        model_font_pth: path to font model
+        model_box_pth: path to location model
 
+    Returns:
+
+    """
 
     m1=traditional_feature_prediction.load((model_font_pth))
     m2=traditional_feature_prediction.load((model_box_pth))

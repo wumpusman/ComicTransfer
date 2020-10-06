@@ -1,6 +1,13 @@
 from google.cloud import translate
 class TranslationDefault():
-    
+
+    """
+    Attributes:
+        estimator: an object that down the line can help with reassigning text prediction given provided translations
+        _should_cache: option to save current resutls
+        _language: what language are you translating
+        _cache: array to  temporary store ressults
+    """
     def __init__(self,estimator=None,cache_results=False):
         """
         Wrapper class that just defaults for japanese to english
@@ -18,18 +25,29 @@ class TranslationDefault():
     
 
 class TranslationGoogle(TranslationDefault):
-    
+    """
+    Attributes:
+        client: client object from google services
+        _project_id: an id identifyign a google project, required at a minimum
+    """
     def __init__(self,project_id,cache_results=False):
         """
         A wrapper for google image text bounding and ocr as a first pass
    
         """
         super().__init__(None,cache_results)
-        self.client= client = translate.TranslationServiceClient()
+        self.client = translate.TranslationServiceClient()
         self._project_id=project_id #a requirement for translation services internally
     
     def predict(self,texts:list)->list:
-        
+        """
+        return text predictions as a list
+        Args:
+            texts:list of japanese texts
+
+        Returns:
+            list
+        """
         results=self.translate_text(texts)
         
         return [i.translated_text for i in results.translations ]
@@ -45,8 +63,7 @@ class TranslationGoogle(TranslationDefault):
         parent = f"projects/{self._project_id}/locations/{location}"
         src=self._language
         target:str="en-US"
-        # Detail on supported types can be found here:
-        # https://cloud.google.com/translate/docs/supported-formats
+
         response = client.translate_text(
                 parent= parent,
                 contents= texts,

@@ -14,7 +14,7 @@ import numpy as np
 
 
 
-def get_iou(bb1:dict, bb2:dict):
+def get_iou(bb1:dict, bb2:dict)->float:
     """
         an implementation of Intersection over union slow - very slightly modified from #todo optimize it
         https://stackoverflow.com/questions/25349178/calculating-percentage-of-bounding-box-overlap-for-image-detector-evaluation
@@ -25,17 +25,14 @@ def get_iou(bb1:dict, bb2:dict):
     Returns:
         float
     """
-    #bb1=quick_swap(bb1,"x1","x2")
-    #bb1=quick_swap(bb1, "y1", "y2")
-    #bb2=quick_swap(bb2, "x1", "x2")
-    #bb2=quick_swap(bb2, "y1", "y2")
+
     try:
         assert bb1['x1'] < bb1['x2']
         assert bb1['y1'] < bb1['y2']
         assert bb2['x1'] < bb2['x2']
         assert bb2['y1'] < bb2['y2']
     except:
-        return .1
+        return 0 #if predictions are off return failure
 
     # determine the coordinates of the intersection rectangle
     x_left = max(bb1['x1'], bb2['x1'])
@@ -85,6 +82,10 @@ class PredictionBoundingTraditional(FeaturePredictionTraditional):
 
 
     def __init__(self):
+        """
+        Same as prediction bounding, but uses IOU metric and assumes output of the form
+        x1,y1 (top left), x2,y2 (bottom right)
+        """
 
         super().__init__()
 
@@ -108,9 +109,10 @@ class PredictionBoundingTraditional(FeaturePredictionTraditional):
         self._model.fit(x,y)
 
 class PredictionBoundingBaseline(PredictionBoundingTraditional):
-    """Overlays the JP bounding box onto the english one with no modeling
-    """
+
     def __init__(self):
+        """Overlays the JP bounding box onto the english one with no modeling
+        """
         super().__init__()
     
     def fit(self,x,y,preprocess:bool=False):
@@ -134,39 +136,6 @@ class PredictionBoundingBaseline(PredictionBoundingTraditional):
         super().set_features(x_names,y_names)
             
 
-class PredictionBoundingTraditional2(PredictionBoundingTraditional):
-    """
-    Predicts bounding but uses the x,y, width and height separately as opposed to x,y,x1,y2 
-    """
-
-    def __init__(self):
-        super().__init__()
-
-
-    def _transform_to_coord(self,data):
-        results_pd= pd.DataFrame(data)
-        transformed=pd.DataFrame()
-
-        transformed["x1"]=results_pd[0]
-
-        transformed["y1"]=results_pd[1]
-        transformed["x2"]=results_pd[2]+results_pd[0]
-        transformed["y2"]=results_pd[3]+results_pd[1]
-        return transformed.values
-
-    def score(self,predicted,ground_truth) ->float:
-        predicted=self._transform_to_coord(predicted)
-        ground_truth=self._transform_to_coord(ground_truth)
-        return super().score(predicted,ground_truth)
-
-
-    def set_features(self, x_names: list = ["top_jp", "left_jp", "width_jp", "height_jp", "text_jp_len"],y_names: list = ["left_en",'top_en',"width_en","height_en"]):
-        super().set_features(x_names, y_names)
-
-    #def preprocess(self, x:list, fit_it:bool=False):
-     #   return x
-
-
         
 
 if __name__ == '__main__':
@@ -177,7 +146,7 @@ if __name__ == '__main__':
                          ]
 
     all_manga_pds = []
-    data_path= "/home/jupyter/ComicTransfer/data/bilingual_tsv" 
+    data_path= "../../../data/bilingual_tsv"
     data_name = "Doraemon_Long_Stories_selenium.tsv"
 
     for name in files_of_interest:
@@ -187,7 +156,7 @@ if __name__ == '__main__':
         all_manga = all_manga.drop(columns=["level_0"])
         all_manga_pds.append(all_manga)
 
-    all_manga=pd.concat(all_manga_pds)
+    all_manga=pd.concat(all_manga_pds,sort=False)
     print("OK")
     from sklearn.multioutput import MultiOutputRegressor
     from sklearn.ensemble import RandomForestRegressor
@@ -230,7 +199,7 @@ if __name__ == '__main__':
     print(aggregated.columns)
     print(p.score_cv())
     
-    x_names = ["x1_jp","y1_jp","x2_jp","y2_jp","top_jp", "left_jp", "width_jp", "height_jp","text_jp_len"] #,"y21","y22","x22","x12"]
+    x_names = ["x1_jp","y1_jp","x2_jp","y2_jp","top_jp", "left_jp", "width_jp", "height_jp","text_jp_len","y21","y22","x22","x12"]
     y_names = ['x1_en', 'y1_en', 'x2_en', 'y2_en']
 
     #x_names =['x1_jp', 'y1_jp', 'x2_jp', 'y2_jp']#  ["y21", "y22", "x22", "x12", "x1_jp", "y1_jp", "x2_jp", "y2_jp", "top_jp", "left_jp", "width_jp",
@@ -256,11 +225,13 @@ if __name__ == '__main__':
     c=MultiOutputRegressor(NuSVR())
     stacking_est=[("a",a),("b",be),("c",c)]
 
-
+    import sklearn.gaussian_process as gp
     rf =GradientBoostingRegressor(loss="ls") #LinearSVR(epsilon=.01,max_iter=4000) #MLPRegressor(alpha=.4,hidden_layer_sizes=(10,1))#LinearSVR(max_iter=10000) #KNeighborsRegressor(12,weights='distance') #RandomForestRegressor(max_depth=10) # RandomForestRegressor(max_depth=5,random_state=0)
     #rf=
-    multra = MultiOutputRegressor(rf)
-    b.set_model(multra)
+
+    gaus=gp.GaussianProcessRegressor(alpha=.8)
+    multra = MultiOutputRegressor(gaus)
+    b.set_model( multra)
     b.set_features(x_names)#,y_names) #y_names)
     print(b.score_cv())
     

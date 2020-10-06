@@ -2,7 +2,7 @@ from extract_img_selenium import *
 from bs4 import BeautifulSoup
 import requests as req
 import pandas as pd
-
+from core.scrapping import extract_img_selenium
 import urllib
 
 import os
@@ -10,6 +10,15 @@ import time
 
 
 def extract_dictionary(element, additional_dict_values: dict = {}):
+    """
+    extracts key value pairs from html parsed by beautiful soup of bilingualmagna
+    Args:
+        element:
+        additional_dict_values:
+
+    Returns:
+
+    """
     all_pairs = []
     index = 0
     for sub in element:
@@ -24,7 +33,7 @@ def extract_dictionary(element, additional_dict_values: dict = {}):
                 continue
             key = pair[0]
             val = pair[1]
-            val = parseKnown(key, val)
+            val = extract_img_selenium.parse_known(key, val)
             dictionary[key] = val
         dictionary["text"] = sub.getText().replace(",", "")
         dictionary["box_id"] = index

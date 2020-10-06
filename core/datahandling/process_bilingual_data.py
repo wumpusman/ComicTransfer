@@ -4,11 +4,14 @@ import os
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
 
-def read_tsv_files(paths:list):
+def read_tsv_files(paths:list)->pd.DataFrame:
     """
-    aggregatees multiple selenium tsv results into a single large file
-    :param paths: path to the directory of saved results for each manga - expected as a tsv
-    :return:
+      aggregates multiple selenium tsv results into a single large file
+    Args:
+        paths: a list of paths to associated tsv results
+
+    Returns:
+        pd.Dataframe
     """
 
     all_mangas_pds:list=[]
@@ -33,11 +36,85 @@ class Preprocess_Bilingual():
     def __init__(self):
         """
         Preprocesses data for downstream tasks to be used for basic model analysis
-        Primarily
+        asssociated with extraction done by extract_img_selenium
 
         """
         self._data_to_process=None
 
+
+    def output_all_features_font_size(self,normalize:bool=False)->tuple:
+        """
+        outputs all features relevant to font size as a tuple of dataframes X, y
+        Args:
+            normalize: return certain features normalized by page size
+
+        Returns:
+            tuple
+        """
+        x_feature_names = ['width_jp', 'height_jp', 'top_jp', 'left_jp',
+                           'x1_jp', 'y1_jp', 'x2_jp', 'y2_jp', 'text_jp_len',
+                           'nn1', 'nn2', 'box_num', 'x1_jp_squared',
+                           'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
+                           'width_jp_squared']
+
+        y_feature_names = ['font-size_en']
+
+        all_pd = self.output_all_features(normalize)
+        x_pd = all_pd[x_feature_names]
+        y_pd = all_pd[y_feature_names]
+        return x_pd, y_pd
+
+    def output_all_features_iou(self,normalize:bool=False)->tuple:
+        """
+        outputs all features relevant to bounding box  as a tuple of dataframes X, y
+        Args:
+            normalize: return certain features normalized by page size
+
+        Returns:
+            tuple
+        """
+        x_feature_names = ['width_jp', 'height_jp', 'top_jp', 'left_jp',
+                           'x1_jp', 'y1_jp', 'x2_jp', 'y2_jp', 'text_jp_len',
+                           'nn1', 'nn2', 'box_num', 'x1_jp_squared',
+                           'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
+                           'width_jp_squared']
+
+        y_feature_names = ['x1_en', 'y1_en', 'x2_en', 'y2_en']
+
+        all_pd=self.output_all_features(normalize)
+        x_pd=all_pd[x_feature_names]
+        y_pd=all_pd[y_feature_names]
+        return x_pd,y_pd
+
+    def output_all_features(self, normalize:bool=False)->pd.DataFrame:
+        """
+        aggregates the organized features in a matrix
+        Args:
+            normalize: are input features normalized by size of page if relevant
+
+        Returns:
+            pd.DataFrame
+        """
+
+        X_feature_names = ['width_jp', 'height_jp', 'top_jp', 'left_jp',
+                           'x1_jp', 'y1_jp', 'x2_jp', 'y2_jp', 'text_jp_len',
+                            'nn1', 'nn2', 'box_num', 'x1_jp_squared',
+                           'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
+                           'width_jp_squared','font-size_jp']
+
+        y_feature_names = ['x1_en', 'y1_en', 'x2_en', 'y2_en']
+
+        box_area = self.extract_box_area(normalize)
+        box_location = self.extract_box_location(normalize)
+        box_coords = self.to_box_coords(normalize)
+        text_info = self.extract_text_length()
+        font_size = self.extract_font_size()
+        neighbors_and_boxes_on_page=self.extract_macro_features()
+        squared_features=self.extract_squared_features(normalize)
+
+        pd_features=self.aggregate_to_pandas([box_area,box_location,box_coords,text_info,font_size,neighbors_and_boxes_on_page,squared_features])
+
+        return pd_features
 
     def aggregate_to_pandas(self,processed_data:list)->pd.DataFrame:
         """
@@ -58,10 +135,12 @@ class Preprocess_Bilingual():
 
     def _add_meta_information(self):
         """gives information about nearest neighbor distance, and box info on the page
-           this expands to other features
-        :return:
+           to data being processed
+        Returns:
             None
         """
+        if ("link" in self._data_to_process)==False: #in case there is no link such as when predicting
+            self._data_to_process["link"]="empty"
 
         unique_pages = self._data_to_process.link.unique()
         links = self._data_to_process.groupby("link")
@@ -162,7 +241,7 @@ class Preprocess_Bilingual():
             dict
         """
         data = self._data_to_process
-        return data[["font-size_jp","font-size_en"]]
+        return data[["font-size_jp","font-size_en"]].to_dict()
 
 
     def extract_box_location(self,normalize:bool=True)->dict:
@@ -205,7 +284,7 @@ class Preprocess_Bilingual():
             normalize: is this absolute or relative
 
         Returns:
-
+            pd.DataFrame
         """
         box_area: dict = self.extract_box_area(normalize)
         box_location: dict = self.extract_box_location(normalize)
@@ -229,7 +308,7 @@ class Preprocess_Bilingual():
 
 
 
-    #https://stackoverflow.com/questions/25349178/calculating-percentage-of-bounding-box-overlap-for-image-detector-evaluation
+
     def to_box_coords(self,normalize:bool=True)->dict:
         """
             takes in size and offset of jp and english and returns
@@ -245,6 +324,29 @@ class Preprocess_Bilingual():
         en_data:pd.DataFrame=self._to_box_coords("en",normalize)
 
         return pd.concat([jp_data,en_data],axis=1).to_dict()
+
+    def extract_squared_features(self, normalize:bool=True)->dict:
+
+
+        jp_area=pd.DataFrame(self.extract_box_area(normalize))[["width_jp","height_jp"]]
+        jp_area=jp_area*jp_area
+        jp_area.columns=["width_jp_squared","height_jp_squared"]
+
+        jp_loc=pd.DataFrame(self.to_box_coords(normalize))[["x1_jp","y1_jp","x2_jp","y2_jp"]]
+        jp_loc=jp_loc*jp_loc
+        jp_loc.columns=["x1_jp_squared","y1_jp_squared","x2_jp_squared","y2_jp_squared"]
+
+        return pd.concat([jp_loc,jp_area],axis=1).to_dict()
+
+
+
+    def extract_macro_features(self)->dict:
+        """
+            get macro features associated with the jp box info
+        Returns:
+            dict
+        """
+        return self._data_to_process[["nn1","nn2","box_num"]].to_dict()
 
     def extract_box_area(self,normalize:bool=True)->dict:
         """
@@ -346,6 +448,24 @@ if __name__ == '__main__':
     assert (int(temp["x2_jp"][2]),int(temp["y2_jp"][2]))==(350,1069)
 
 
+    temp = pre_bi.extract_macro_features()
 
+    assert (int(temp["nn1"][0])==309)
+    assert (int(temp["nn2"][0]) == 667)
+    assert (int(temp["box_num"][0])==6)
+
+
+    temp=pd.DataFrame((pre_bi.extract_squared_features(False)))
+    assert(int(temp["x1_jp_squared"][0])==(410881))
+    assert(int(temp["height_jp_squared"][1]==(5184)))
+
+
+    temp=pre_bi.output_all_features()
+    x, y = pre_bi.output_all_features_font_size()
+    assert (x.shape==(157,17))
+    assert (y.shape)==(157,1)
+
+    x, y = pre_bi.output_all_features_iou()
+    assert (x.shape==(157,17))
+    assert (y.shape)==(157,4)
     print("OK")
-

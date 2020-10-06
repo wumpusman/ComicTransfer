@@ -7,6 +7,14 @@ from sklearn.neighbors import NearestNeighbors
 import pandas as pd
 
 def create_web_driver(path="chromedriver"):
+    """
+    creates a webdriver for selenium
+    Args:
+        path: path to chromedriver in selenium
+
+    Returns:
+        webdriver.driver
+    """
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
@@ -19,6 +27,16 @@ def create_web_driver(path="chromedriver"):
 
 
 def save_image(driver, html_element, output):
+    """
+    save a screen show to the page
+    Args:
+        driver: driver for selenium
+        html_element: the html to be saved
+        output: output path
+
+    Returns:
+        None
+    """
     driver.save_screenshot(output)
 
     height = html_element.get_attribute("height")
@@ -37,9 +55,11 @@ def save_image(driver, html_element, output):
 
 
 
-def align_jp_and_en_boxes(pd_results):
-    """boxes are not ordered on the page, so heuristically must match them
+def align_jp_and_en_boxes(pd_results)->pd.DataFrame:
+    """boxes are not ordered on the page, so heuristically must match them based on
+    location on page
     """
+
     japanese_results = pd.DataFrame.copy(pd_results[pd_results.language == "jp"]).reset_index()
     english_results = pd.DataFrame.copy(pd_results[pd_results.language == "en"]).reset_index()
 
@@ -54,17 +74,44 @@ def align_jp_and_en_boxes(pd_results):
     return japanese_results.append(english_results).reset_index()
 
 def parse_color(key, string):
+    """
+    parses the color html of form 'rgb(0,0,0)'
+    Args:
+        key: string that is a color
+        string: associated string value in the html
+
+    Returns:
+
+    """
     assert key == "color"
     string = string.replace("rgb(", "").replace(")", "").split(", ")
     return string
 
 
 def parse_number(key, string):
+    """
+    parse numeric values
+    Args:
+        key: type of html
+        string: a string that represents the font
+
+    Returns:
+
+    """
     size = string.split(", ")[0].replace("px", "")
     return float(size)
 
 
-def parseKnown(key, val):
+def parse_known(key, val):
+    """
+    maps string from html to to function for parsing
+    Args:
+        key: string from html
+        val: associated value in html
+
+    Returns:
+
+    """
     key_to_func = {}
     key_to_func["left"] = parse_number
     key_to_func["top"] = parse_number
@@ -91,7 +138,7 @@ def extract_dictionary(element):
             continue
         key = pair[0].replace(" ", "")
         val = pair[1]
-        val = parseKnown(key, val)
+        val = parse_known(key, val)
         dictionary[key] = val
 
 
@@ -99,6 +146,15 @@ def extract_dictionary(element):
 
 
 def save_meta_data_eng_jp_pairs(driver,link):
+    """
+    saves aggregate info about image such language and image size
+    Args:
+        driver: chrome driver used by selenium
+        link: link to visit
+
+    Returns:
+
+    """
     jp_ones = driver.find_elements_by_class_name("main")[0].find_elements_by_class_name("div-text")
     en_ones = driver.find_elements_by_class_name("sub")[0].find_elements_by_class_name("div-text")
     counterJp=0
@@ -139,7 +195,7 @@ def save_meta_data_eng_jp_pairs(driver,link):
 
 
 def save_eng_jp_pairs(driver, link, dir_path, file_id):
-    """save image in both forms 
+    """save image with both japanese text overlaid and english
     """
     if os.path.isdir(dir_path) == False:
         os.mkdir(dir_path)

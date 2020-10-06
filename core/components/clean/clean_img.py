@@ -4,7 +4,11 @@ class CleanDefault():
     
     
     def __init__(self):
-        pass
+        """
+        an exceptionally simple model for cleaning an image by replacing bounding boxes with
+        empty space
+        """
+
     
     def clean(self,image_cv:np.array,bounding_boxes:[]=None,mask:np.array=None):
         """ literally add white space into the bounding boxes, super naive
