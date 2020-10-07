@@ -8,7 +8,7 @@ import sklearn.datasets
 import sklearn.metrics
 import sklearn
 
-default_path_tsv="../../../data/bilingual_tsv"
+default_path_tsv= "../../data/bilingual_tsv"
 results_save_path="/tmp/simple_evaluation"
 max_time=200
 per_model_time=30

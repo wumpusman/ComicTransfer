@@ -1,15 +1,17 @@
 
 import os
+import sys
+sys.path.append("../../")
 from core.datahandling import process_bilingual_data
 from core.models import traditional_feature_prediction, iou_prediction
 from sklearn.linear_model import LinearRegression
 import argparse
 
-default_path_tsv="../../../data/bilingual_tsv"
-save_model_path="temp1.pkl"
+default_path_tsv= "../../data/bilingual_tsv"
+save_model_path= "feature_engineering/temp2.pkl"
 save_model:bool=True
 run_ablation:bool=False
-model_type:str="font"
+model_type:str="bound"
 
 parser = argparse.ArgumentParser(description='setup for training models, as well as simple ablations')
 parser.add_argument("-d","--datadir",help="path to tsv files",default=default_path_tsv)
@@ -85,13 +87,14 @@ def main (model_type:str,dir_path,save_path:str="temp.pkl",save_model:bool=False
             print(prediction_wrapper.score_cv())
 
     if save_model:
-        print("SAVEEEE")
+
         prediction_wrapper.fit(prediction_wrapper._x, prediction_wrapper._y,preprocess=True)
         traditional_feature_prediction.save(prediction_wrapper, save_path)
 
 
 if __name__ == '__main__':
-    print("OKff")
+
+
     args = parser.parse_args()
 
     main(args.type,args.datadir, args.savepath, args.savemodel, args.ablate)

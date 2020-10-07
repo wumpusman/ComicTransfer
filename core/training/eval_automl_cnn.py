@@ -1,6 +1,18 @@
 from google.cloud import automl
 
 
+import argparse
+import os
+
+dir_img_path:str=""
+dir_destination_path:str=""
+project_id="hidden"
+model_id="hidden"
+
+imgs=os.listdir(dir_img_path)
+relevant_images=[os.path.join(dir_img_path,i) for i in imgs if "png" in i]
+
+
 prediction_client = automl.PredictionServiceClient()
 project_id="hidden"
 model_id="hidden"

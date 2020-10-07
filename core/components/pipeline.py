@@ -44,7 +44,7 @@ class PipeComponents():
         self._image_overlaid_text=None #image with text overlaid on it
         self._ran_once = False  # did it run once
         if font_path == "":
-            self._default_font_path='/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf'
+            self._default_font_path= '../../data/LiberationMono-Bold.ttf'
 
 
 
