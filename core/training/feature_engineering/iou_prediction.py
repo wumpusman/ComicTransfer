@@ -106,6 +106,8 @@ class PredictionBoundingTraditional(FeaturePredictionTraditional):
         return total_score/len(predicted)
 
     def fit(self,x,y,preprocess:bool=False):
+        if preprocess:
+            x=self.preprocess(x,True)
         self._model.fit(x,y)
 
 class PredictionBoundingBaseline(PredictionBoundingTraditional):

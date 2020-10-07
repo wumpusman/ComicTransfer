@@ -11,10 +11,10 @@ from sklearn.neighbors import KNeighborsRegressor
 import argparse
 
 default_path_tsv="../../../data/bilingual_tsv"
-save_model_path="temp.pkl"
-save_model:bool=False
+save_model_path="temp2.pkl"
+save_model:bool=True
 run_ablation:bool=False
-model_type:str="font"
+model_type:str="bound"
 
 parser = argparse.ArgumentParser(description='setup for training models, as well as simple ablations')
 parser.add_argument("-d","--datadir",help="path to tsv files",default=default_path_tsv)
@@ -50,7 +50,7 @@ def main (model_type:str,dir_path,save_path:str="temp.pkl",save_model:bool=False
     all_data = process.output_all_features()
 
     print("training")
-
+    #["x1_jp","y1_jp","x2_jp","y2_jp","text_jp_len",'left_jp','width_jp','height_jp']
     x_pd, y_pd, x_names, y_names = None, None, None, None
     prediction_wrapper = None
     if model_type=="bound":
@@ -62,6 +62,8 @@ def main (model_type:str,dir_path,save_path:str="temp.pkl",save_model:bool=False
         prediction_wrapper = iou_prediction.PredictionBoundingTraditional()
         prediction_wrapper.set_data(all_data)
         prediction_wrapper.set_features(x_names)
+        prediction_wrapper.set_features(x_names,y_names)
+
     elif model_type=="font":
         x_pd, y_pd = process.output_all_features_font_size()
         x_names = x_pd.columns.values
@@ -75,7 +77,7 @@ def main (model_type:str,dir_path,save_path:str="temp.pkl",save_model:bool=False
         raise Exception("no known model type specified")
 
     #MultiOutputRegressor(GradientBoostingRegressor())
-    prediction_wrapper.set_model(GradientBoostingRegressor())
+    prediction_wrapper.set_model(LinearRegression())
     print(prediction_wrapper.score_cv())
 
 
@@ -88,51 +90,15 @@ def main (model_type:str,dir_path,save_path:str="temp.pkl",save_model:bool=False
             print(prediction_wrapper.score_cv())
 
     if save_model:
-        prediction_wrapper.fit(prediction_wrapper._x, prediction_wrapper._y)
+        print("SAVEEEE")
+        prediction_wrapper.fit(prediction_wrapper._x, prediction_wrapper._y,preprocess=True)
         traditional_feature_prediction.save(prediction_wrapper, save_path)
 
 
 if __name__ == '__main__':
-    print("OK")
+    print("OKff")
     args = parser.parse_args()
 
     main(args.type,args.datadir, args.savepath, args.savemodel, args.ablate)
-
-    """
-    path = "../../../data/bilingual_tsv"
-    files: list = os.listdir(path)
-    file_names: list = [i for i in path if ("selenium.tsv" in i)]
-    full_path: str = [os.path.join(path, name) for name in files]
-
-    mangas = process_bilingual_data.read_tsv_files(full_path)
-    process = process_bilingual_data.Preprocess_Bilingual()
-    process.set_data(mangas)
-
-    x_pd, y_pd = process.output_all_features_iou()
-    x_names = x_pd.columns.values
-    y_names = y_pd.columns.values
-    all_data=process.output_all_features()
-    bounding_predictor_wrapper = iou_prediction.PredictionBoundingTraditional()
-    bounding_predictor_wrapper.set_data(all_data)
-    bounding_predictor_wrapper.set_features(x_names)
-    bounding_predictor_wrapper.set_model(MultiOutputRegressor(GradientBoostingRegressor()))
-    print(bounding_predictor_wrapper.score_cv())
-
-    bounding_predictor_wrapper.fit(bounding_predictor_wrapper._x,bounding_predictor_wrapper._y)
-    print(type(x_names))
-    print(x_names)
-    #simple ablation - todo: add greedy feature selection search to get general importance of features 
-    for feature in range(len(x_names)):
-        print("{} feature removed".format(x_names[feature]))
-        temp_x_names=x_names.copy().tolist()
-        del temp_x_names[feature]
-        bounding_predictor_wrapper.set_features(temp_x_names)
-        print(bounding_predictor_wrapper.score_cv())
-    #    copy(x_names)
-     #   bounding_predictor_wrapper=iou_prediction.PredictionBoundingTraditional()
-        #bounding_predictor_wrapper.set_data(all_data)
-        #bounding_predictor_wrapper.set_features(x_names)
-     """
-
 
 

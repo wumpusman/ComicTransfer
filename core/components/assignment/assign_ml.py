@@ -96,7 +96,8 @@ def load_default_model(model_font_pth="core/training/feature_engineering/temp1.p
 
     m1=traditional_feature_prediction.load((model_font_pth))
     m2=traditional_feature_prediction.load((model_box_pth))
-
+    print(m1._x_names)
+    print(m2._x_names)
     aML=AssignTextML()
     aML.set_font_model(m1)
     aML.set_location_model(m2)
@@ -123,6 +124,7 @@ if __name__ == '__main__':
 
     font1=m1.predict(actual_results_pd[m1._x_names].values,True).astype(int)
     loc1=m2.predict(actual_results_pd[m2._x_names].values,True).astype(int)
+
 
     aML=AssignTextML()
     aML.set_font_model(m1)

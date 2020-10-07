@@ -1,6 +1,7 @@
 from google.cloud import vision
 import io
-import pandas as pd 
+import pandas as pd
+from core.datahandling.process_bilingual_data import Preprocess_Bilingual
 class BoundingDefault():
     
     def __init__(self,estimator=None,cache_results=False):
@@ -68,6 +69,10 @@ class BoundingGoogle(BoundingDefault):
         
         all_results_pd=pd.DataFrame(all_results)
         all_results_pd.columns=names
+        all_results_pd=Preprocess_Bilingual.convert_features_from_raw_page(all_results_pd)
+
+        print("IT's fine")
+        #print(all_results_pd.values)
         return all_results_pd
 
         

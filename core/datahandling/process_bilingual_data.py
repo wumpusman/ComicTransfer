@@ -41,6 +41,41 @@ class Preprocess_Bilingual():
         """
         self._data_to_process=None
 
+    @staticmethod
+    def convert_features_from_raw_page(page_data:pd.DataFrame)->pd.DataFrame:
+        """
+        converts features from a raw page into a similar form of features in bilingual process
+        Args:
+            page_data: a dataframe that has data with the columns
+            ['x1_jp','y1_jp','x2_jp','y2_jp','top_jp','left_jp','width_jp',
+                   'height_jp','text_jp_len',"text_jp"]
+
+        Returns:
+            pd.DataFrame
+        """
+
+        expected_minimum_feature_names = ['width_jp', 'height_jp', 'top_jp', 'left_jp',
+                           'x1_jp', 'y1_jp', 'x2_jp', 'y2_jp', 'text_jp_len',
+                           'nn1', 'nn2', 'box_num', 'x1_jp_squared',
+                           'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
+                           'width_jp_squared']
+
+        Preprocess_Bilingual._add_meta_information(page_data)
+
+        squared=page_data[['x1_jp', 'y1_jp', 'x2_jp', 'y2_jp']]
+        squared=squared*squared
+        squared=pd.DataFrame(squared.values)
+        squared.columns=['x1_jp_squared','y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared']
+
+
+        jp_area=page_data[['width_jp', 'height_jp']]
+        jp_area=jp_area*jp_area
+        jp_area=pd.DataFrame(jp_area)
+        jp_area.columns=["width_jp_squared","height_jp_squared"]
+
+        return pd.concat([page_data,squared,jp_area],axis=1)
+
+
 
     def output_all_features_font_size(self,normalize:bool=False)->tuple:
         """
@@ -133,27 +168,38 @@ class Preprocess_Bilingual():
 
         return pd.concat(pd_form,axis=1)
 
-    def _add_meta_information(self):
+    @staticmethod
+    def _add_meta_information(original_data_frame):
         """gives information about nearest neighbor distance, and box info on the page
            to data being processed
         Returns:
             None
         """
-        if ("link" in self._data_to_process)==False: #in case there is no link such as when predicting
-            self._data_to_process["link"]="empty"
+        if ("link" in original_data_frame.columns)==False: #in case there is no link such as when predicting
+            original_data_frame["link"]="empty"
 
-        unique_pages = self._data_to_process.link.unique()
-        links = self._data_to_process.groupby("link")
+        coords_names = ["x1_jp", "y1_jp", "x2_jp", "y2_jp"]
+
+        unique_pages = original_data_frame.link.unique()
+        links = original_data_frame.groupby("link")
         all_meta = []
         for page in unique_pages:
             specific_page = links.get_group(page)
             temp_process = Preprocess_Bilingual()
             temp_process._data_to_process = specific_page.reset_index()
 
-            coords = pd.DataFrame(temp_process.to_box_coords(False))
+            #check if coords already exist
+
+            coords = None
+            coords_exist =  all(elem in original_data_frame.columns for elem in coords_names)
+            if coords_exist==False:
+                coords = pd.DataFrame(temp_process.to_box_coords(False))
+            else:
+                coords =original_data_frame[coords_names]
+
             if len(coords) >= 3:
                 nn = NearestNeighbors(n_neighbors=3)
-                distances = coords[["x1_jp", "y1_jp", "x2_jp", "y2_jp"]].values
+                distances = coords[coords_names].values
 
                 nn.fit(distances)
                 distances = nn.kneighbors(distances)[0][:, 1:]
@@ -168,9 +214,9 @@ class Preprocess_Bilingual():
                 all_meta.append(the_distance)
 
         additional_features=pd.concat(all_meta)
-        self._data_to_process["nn1"]=additional_features["nn1"].values
-        self._data_to_process["nn2"]=additional_features["nn2"].values
-        self._data_to_process["box_num"]=additional_features["box_num"].values
+        original_data_frame["nn1"]=additional_features["nn1"].values
+        original_data_frame["nn2"]=additional_features["nn2"].values
+        original_data_frame["box_num"]=additional_features["box_num"].values
 
     def set_data(self,data:pd.DataFrame):
         """
@@ -183,7 +229,7 @@ class Preprocess_Bilingual():
         """
 
         self._data_to_process= self._format_data(data)
-        self._add_meta_information()
+        self._add_meta_information(self._data_to_process)
 
     def _format_data(self,manga_pd:pd.DataFrame)->pd.DataFrame:
         """aligns and formatting japanese and english meta features from scraped data that is used for downstream analysis
