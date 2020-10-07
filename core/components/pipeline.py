@@ -169,22 +169,6 @@ class PipeComponents():
 
 
 
-if __name__ == '__main__':
-        image_path="../../data/007.png"
-        image_cv=cv2.imread(image_path,cv2.IMREAD_COLOR)
-
-        pipeline_obj=PipeComponents()
-
-        model_text_pth="../training/feature_engineering/temp2.pkl"
-        model_font_size_pth="../training/feature_engineering/temp1.pkl"
-        assign_obj=assign_ml.load_default_model(model_font_size_pth,model_text_pth)
-        pipeline_obj.set_assignment_model(assign_obj)
-
-
-        pipeline_obj.calculate_results_from_path(image_path)
-
-        print("done_temp")
-        #pipeline_obj.calculate_results()
 
 
 
