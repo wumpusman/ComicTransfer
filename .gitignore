@@ -1,5 +1,7 @@
 data/*
 data2/*
+chicken_scratch/
+__pycache__/
 !data2/temp.txt
 *.pkl
 *.csv

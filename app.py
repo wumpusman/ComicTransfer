@@ -1,24 +1,10 @@
 import streamlit as st
 # To make things easier later, we're also importing numpy and pandas for
 # working with sample data.
-import numpy as np
-import pandas as pd
-import os
-import os
-import io
 import PIL.Image as Image
-from core.components.alignment import predict_jp_bounding
-from core.components.translation import predictor_translate
-from core.training.feature_engineering.traditional_feature_prediction import FeaturePredictionTraditional
-from core.training.feature_engineering.iou_prediction import PredictionBoundingTraditional
-from core.components.clean import clean_img
 from core.components.assignment import assign_text
-from core.components.assignment import assign_ml
-from core.components import pipeline
 from streamlit.elements import image_proto
 
-from google.cloud import vision
-import io
 from core.components import pipeline
 from core.components.assignment import assign_ml
 

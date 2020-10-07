@@ -1,20 +1,15 @@
 
 import os
 from core.datahandling import process_bilingual_data
-from core.training.feature_engineering import iou_prediction
-from core.training.feature_engineering import  traditional_feature_prediction
-from sklearn.ensemble import RandomForestRegressor
+from core.models import traditional_feature_prediction, iou_prediction
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.neighbors import KNeighborsRegressor
 import argparse
 
 default_path_tsv="../../../data/bilingual_tsv"
-save_model_path="temp2.pkl"
+save_model_path="temp1.pkl"
 save_model:bool=True
 run_ablation:bool=False
-model_type:str="bound"
+model_type:str="font"
 
 parser = argparse.ArgumentParser(description='setup for training models, as well as simple ablations')
 parser.add_argument("-d","--datadir",help="path to tsv files",default=default_path_tsv)

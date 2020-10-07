@@ -7,11 +7,13 @@ from core.components.alignment import predict_jp_bounding
 from core.components.translation import predictor_translate
 from core.components.clean import clean_img
 from core.components.assignment import assign_text
+from core.components import pipeline
 
-default_image_path:str="/home/jupyter/ComicTransfer/data/temp.png"
+default_image_path:str="/../../data/temp.png"
 parser = argparse.ArgumentParser(description='sample for running the converter with default')
 parser.add_argument("-p","--file_path",help="path to a jpg or png",default=default_image_path)
 parser.add_argument("-f","--font_type",help="path to font to be used",default='/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf')
+parser.add_argument("-m","--model_font_size",help="path to model font size")
 parser.add_argument("-d","--destination",help="path to destination folder",default="temp_output.jpg")
 
 

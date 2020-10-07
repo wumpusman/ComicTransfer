@@ -1,8 +1,7 @@
 from core.datahandling import process_bilingual_data
-from core.training.feature_engineering import iou_prediction
+from core.models import iou_prediction
 import argparse
 import os
-import sys
 import autosklearn.regression
 import sklearn.model_selection
 import sklearn.datasets
@@ -59,7 +58,7 @@ def main (dir_path:str,save_path:str,max_run_time:int,max_run_per_model:int):
     y_test_pred = final_model.predict(x_test)
     total_score=0
     for y_pred_el,y_test_el in zip(y_test_pred,y_test):
-        total_score+=iou_prediction.get_iou_lists(y_pred_el,y_test_el)
+        total_score+= iou_prediction.get_iou_lists(y_pred_el, y_test_el)
 
     print(total_score/len(y_test))
 

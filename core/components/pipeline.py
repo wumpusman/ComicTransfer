@@ -2,13 +2,8 @@ from core.components.translation import predictor_translate
 from core.components.assignment import assign_ml
 from core.components.clean import clean_img
 from core.components.alignment import predict_jp_bounding
-from core.training.feature_engineering.traditional_feature_prediction import FeaturePredictionTraditional
-from core.training.feature_engineering.iou_prediction import PredictionBoundingTraditional
-import pandas as pd
 import numpy as np
 import pandas as pd
-import os
-import os
 import io
 import PIL.Image as Image
 import cv2
@@ -185,7 +180,7 @@ if __name__ == '__main__':
         assign_obj=assign_ml.load_default_model(model_font_size_pth,model_text_pth)
         pipeline_obj.set_assignment_model(assign_obj)
 
-        print("OK")
+
         pipeline_obj.calculate_results_from_path(image_path)
 
         print("done_temp")
