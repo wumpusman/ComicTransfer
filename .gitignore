@@ -1,5 +1,6 @@
 data/*
-data2/
+data2/*
+!data2/temp.txt
 *.pkl
 *.csv
 model-outputs
