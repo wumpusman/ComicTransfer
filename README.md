@@ -1,13 +1,13 @@
 # ComicTransfer
 A pipeline for quick positioning and font realignment for Japanese Mangas to English
 
-##Motivation
+## Motivation
 The process of editing mangas between languages is a cumbersome process 
 that takes hours, and is primarily done manually.
 Specifically this project focuses on automatically realigning text and positioning,
 with optional cleaning, and translation.
 
-##Prerequistes
+## Prerequistes
 Currently, for core inference, this project has several requirements that are google cloud API dependent, and is expected to
 be embedded in a google compute instance. This requirements include access to google vision api, and google translate api. 
 For setup: [UI setup](https://cloud.google.com/compute/docs/quickstart-linux) , 
@@ -17,7 +17,7 @@ Please note, there is functionality for scraping data, testing and inital traini
 dependencies (see app_local.py, tests/)
 
 
-##Setup
+## Setup
 Clone your repository into your vm instance
 <br>
 <i>Run</i>:
@@ -33,7 +33,7 @@ conda activate ComicTransfer
 pip install -r requirements.txt
 <br>
 
-##Run Streamlit App
+## Run Streamlit App
 streamlit run app.py
 <br>
 Optional: Docker build
