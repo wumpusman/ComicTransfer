@@ -1,6 +1,8 @@
 import pytest
 import pandas as pd
 import sys
+from numpy import testing as np_test
+import numpy as np
 
 sys.path.append("../../..")
 from core.datahandling import process_bilingual_data
@@ -28,7 +30,7 @@ def get_basic_model():
     """
     create a wrapper for training and predictions object
     Returns:
-        process_bilingual_data.Preprocess_Bilingual
+        process_bilingual_data.FeaturePredictionTraditional
     """
 
 
@@ -51,8 +53,20 @@ def test_font_prediction_train(get_text_processing_obj,get_basic_model):
 
     font_model_wrapper.set_features(x_features_names,y_features_names)
 
-    tr_scores, dev_scores = font_model_wrapper.score_cv()
+    tr_scores, dev_scores = font_model_wrapper.score_cv() # cross validation results
 
-    print(tr_scores)
     print(dev_scores)
-    assert False
+    #expected output
+    np_test.assert_allclose(tr_scores,2.0,.5), "training on small subset of data with linear model, training results are different for font size"
+    np_test.assert_allclose(dev_scores, 1.5,.75), "dev on small subset of data with linear model, training results are different for font size"
+
+
+    font_model_wrapper.fit(font_model_wrapper._x, font_model_wrapper._y, preprocess=True)
+
+    results_good=font_model_wrapper.predict(font_model_wrapper._x, preprocess=True)
+    results_bad=font_model_wrapper.predict(font_model_wrapper._x, preprocess=False) #improperly normalized data
+
+    np_test.assert_almost_equal(results_good[0],15,.5), "font size output has changed, check if preprocessing has changed"
+    assert results_bad[0] > 50, "unscaled values should lead to outsized values for prediction, this is not the case"
+
+
