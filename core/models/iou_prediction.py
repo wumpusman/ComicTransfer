@@ -84,12 +84,30 @@ class PredictionBoundingTraditional(FeaturePredictionTraditional):
 
 
     def set_features(self,x_names:list=["top_jp", "left_jp", "width_jp", "height_jp", "text_jp_len"],y_names:list=['x1_en', 'y1_en', 'x2_en', 'y2_en']):
+        """
+        sets features with the one expectation that output y features are x1,y1,x2,y2 format
+        Args:
+            x_names: input feature list of names
+            y_names: output features to be predicted, it's expected to be x1, y1, x2, y2 format
+
+        Returns:
+            None
+        """
         super().set_features(x_names,y_names)
 
 
 
 
     def score(self,predicted,ground_truth) ->float:
+        """
+        score the values based on IOU, how much the two bounding boxes are overlapping
+        Args:
+            predicted: the predicted coordinates in the form x1,y1,x2,y2 (top left, bottom right)
+            ground_truth: a 2D matrix of (N,4) where each row is a specific coordinate set of (x1, y1,x2, y2)
+
+        Returns:
+            float
+        """
         total_score=0
 
         for y_hat,y in zip(predicted,ground_truth):
@@ -103,129 +121,5 @@ class PredictionBoundingTraditional(FeaturePredictionTraditional):
             x=self.preprocess(x,True)
         self._model.fit(x,y)
 
-class PredictionBoundingBaseline(PredictionBoundingTraditional):
 
-    def __init__(self):
-        """Overlays the JP bounding box onto the english one with no modeling
-        """
-        super().__init__()
-    
-    def fit(self,x,y,preprocess:bool=False):
-        return None
-    
-    def predict(self,data:list,preprocess:bool=False)->list:
-        """assumes input feature shape is same output feature shape
-        """
-        return data
-    
-    
 
-    def preprocess(self, x:list, fit_it:bool=False):
-        return x 
-    
-    def set_features(self):
-        """Features must be the same shape and size, by default it's jp and en
-        """
-        x_names=['x1_jp', 'y1_jp', 'x2_jp', 'y2_jp']
-        y_names=['x1_en', 'y1_en', 'x2_en', 'y2_en']
-        super().set_features(x_names,y_names)
-            
-
-        
-
-if __name__ == '__main__':
-    files_of_interest = ["Yokohama_Shopping_Trip_selenium.tsv",
-                         "Toradora!_selenium.tsv",
-                         "Rokuhoudou_Yotsuiro_Biyori_selenium.tsv",
-                         "Kekkonshite_mo_Koishiteru_selenium.tsv"
-                         ]
-
-    all_manga_pds = []
-    data_path= "../../data/bilingual_tsv"
-    data_name = "Doraemon_Long_Stories_selenium.tsv"
-
-    for name in files_of_interest:
-        full_path = os.path.join(data_path, name)
-
-        all_manga = pd.read_csv(full_path, sep="\t", index_col=0)
-        all_manga = all_manga.drop(columns=["level_0"])
-        all_manga_pds.append(all_manga)
-
-    all_manga=pd.concat(all_manga_pds,sort=False)
-    print("OK")
-    from sklearn.multioutput import MultiOutputRegressor
-
-    process = Preprocess_Bilingual()
-    process.set_data(all_manga)
-    process.extract_text()
-    process = Preprocess_Bilingual()
-    process.set_data(all_manga)
-
-    from sklearn.multioutput import MultiOutputRegressor
-
-    box_area = process.extract_box_area()
-    box_location=process.extract_box_location()
-    text_info=process.extract_text()
-    aggregated=process.aggregate_to_pandas([box_area,box_location,text_info])
-    x_names: list = ["width_jp", "height_jp", "text_jp_len"]
-
-    box_area = process.extract_box_area(False)
-    box_location = process.extract_box_location(False)
-    box_coords = process.to_box_coords(False)
-    text_info = process.extract_text_length()
-    font_size = process.extract_font_size()
-    
-    aggregated = process.aggregate_to_pandas([box_coords, box_area, box_location, text_info,font_size])
-    aggregated["x12"]=aggregated["x1_jp"]*aggregated["x1_jp"]
-    aggregated["x12"] = aggregated["x1_jp"] * aggregated["x1_jp"]
-    aggregated["x22"]=aggregated["x2_jp"]*aggregated["x2_jp"]
-    aggregated["x22"] = aggregated["x2_jp"] * aggregated["x2_jp"]
-    aggregated["y22"] = aggregated["y2_jp"] * aggregated["y2_jp"]
-    aggregated["y21"] = aggregated["y1_jp"] * aggregated["y1_jp"]
-    
-    p=PredictionBoundingBaseline()
-    p.set_data(aggregated)
-    p.set_features()
-    
-    print(aggregated.columns)
-    print(p.score_cv())
-    
-    x_names = ["x1_jp","y1_jp","x2_jp","y2_jp","top_jp", "left_jp", "width_jp", "height_jp","text_jp_len","y21","y22","x22","x12"]
-    y_names = ['x1_en', 'y1_en', 'x2_en', 'y2_en']
-
-    #x_names =['x1_jp', 'y1_jp', 'x2_jp', 'y2_jp']#  ["y21", "y22", "x22", "x12", "x1_jp", "y1_jp", "x2_jp", "y2_jp", "top_jp", "left_jp", "width_jp",
-
-    y_names = ["left_jp",'top_jp',"width_jp","height_jp"] #, 'y1_en', 'x2_en', 'y2_en']
-    #y_names = ['x1_jp', 'y1_jp', 'x2_jp', 'y2_jp']
-    #x_names = ['x1_jp', 'y1_jp', 'x2_jp', 'y2_jp'] # "text_jp_len"]
-    y_names =  ["left_en",'top_en',"width_en","height_en"]#['x1_en', 'y1_en', 'x2_en', 'y2_en']
-    #y_names = ["width_jp"]
-    b=PredictionBoundingTraditional()
-    b.set_data(aggregated)
-    from sklearn.linear_model import LinearRegression
-    from sklearn.svm import NuSVR
-    from sklearn.ensemble import GradientBoostingRegressor
-
-    a=MultiOutputRegressor(GradientBoostingRegressor())
-    be=LinearRegression()
-    c=MultiOutputRegressor(NuSVR())
-    stacking_est=[("a",a),("b",be),("c",c)]
-
-    import sklearn.gaussian_process as gp
-    rf =GradientBoostingRegressor(loss="ls") #LinearSVR(epsilon=.01,max_iter=4000) #MLPRegressor(alpha=.4,hidden_layer_sizes=(10,1))#LinearSVR(max_iter=10000) #KNeighborsRegressor(12,weights='distance') #RandomForestRegressor(max_depth=10) # RandomForestRegressor(max_depth=5,random_state=0)
-    #rf=
-
-    gaus=gp.GaussianProcessRegressor(alpha=.8)
-    multra = MultiOutputRegressor(gaus)
-    b.set_model( multra)
-    b.set_features(x_names)#,y_names) #y_names)
-    print(b.score_cv())
-    
-    traditional_feature_prediction.save(b, "../training/feature_engineering/temp2.pkl")
-
-    model2= traditional_feature_prediction.load("../training/feature_engineering/temp2.pkl")
-    
-    print(b.predict(b._x,preprocess=True)[0])
-    print(model2.predict(b._x,preprocess=True)[0])
-    print("OK")
-    

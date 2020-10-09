@@ -22,7 +22,7 @@ parser.add_argument("-p","--file_path",help="path to a jpg or png",default=defau
 parser.add_argument("-f","--font_path",help="path to font to be used",default=default_font_pth)
 parser.add_argument("-s","--model_font_size",help="path to model for font size",default=default_font_model_pth)
 parser.add_argument("-b","--model_bounding_box",help="path to model for bounding box",default=default_bound_model_pth)
-parser.add_argument("-i","--project_id",help="project id associated with a project that has permission for google services",default=default_project_id)
+parser.add_argument("-i","--project_id",help="project id associated with a project that has permission for google cloud services",default=default_project_id)
 parser.add_argument("-o","--output",help="where are you saving the results",default=default_save_dir)
 
 

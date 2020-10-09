@@ -138,7 +138,7 @@ class PipeComponents():
             original_text: original transcripts if avalailable
 
         Returns:
-
+            None
         """
         self.clear_prev_estimates() ## clear results
         results_bounds_ocr:dict=self.extract_boundary_obj.predict_byte(bytestream)

@@ -4,6 +4,7 @@ from core.datahandling import process_bilingual_data
 from shutil import copyfile
 import random
 
+
 import argparse
 
 default_path_img_dir = "/home/data/bilingual_manga/bi/"

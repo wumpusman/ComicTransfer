@@ -91,6 +91,14 @@ class BoundingGoogle(BoundingDefault):
         
     
     def _detect_document_bytes(self,img_bytestream):
+        """
+        gets bounding estimates from google vision api
+        Args:
+            img_bytestream: raw image byte stream
+
+        Returns:
+
+        """
         client =self.client
         content=img_bytestream.read()
         image  = vision.Image(content=content)
@@ -122,13 +130,10 @@ class BoundingGoogle(BoundingDefault):
                         word_text = ''.join([
                             symbol.text for symbol in word.symbols
                         ])
-                       # print('Word text: {} (confidence: {})'.format(
-                          #  word_text, word.confidence))
+
 
                         words+=word_text
-                        #for symbol in word.symbols:
-                           # print('\tSymbol: {} (confidence: {})'.format(
-                              #  symbol.text, symbol.confidence))
+
                     all_words.append(words)
                     bounding_boxes.append({"x":xs,"y":ys})
         if response.error.message:
@@ -162,29 +167,10 @@ class BoundingGoogle(BoundingDefault):
         image = vision.types.Image(content=content)
 
         response = client.text_detection(image=image,image_context={"language_hints": [lang]})
-        texts = response.text_annotations
-        ''' 
-        print('Texts:')
 
-        for text in texts:
-            print('\n"{}"'.format(text.description))
-
-            vertices = (['({},{})'.format(vertex.x, vertex.y)
-                        for vertex in text.bounding_poly.vertices])
-
-            print('bounds: {}'.format(','.join(vertices)))
-
-        if response.error.message:
-            raise Exception(
-                '{}\nFor more info on error messages, check: '
-                'https://cloud.google.com/apis/design/errors'.format(
-                    response.error.message))
-        '''
         return response
     
-    def _format_to_dictionary_sentence(self,google_response)->dict:
-        pass
-    
+
     def _format_to_dictionary_words(self,google_response)->dict:
         """
         Converts google response object to a dictionary with relevant values for analysis

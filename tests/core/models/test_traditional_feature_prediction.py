@@ -4,7 +4,7 @@ import sys
 from numpy import testing as np_test
 import numpy as np
 
-sys.path.append("../../..")
+
 from core.datahandling import process_bilingual_data
 from core.models import traditional_feature_prediction
 from sklearn.linear_model import LinearRegression
@@ -16,7 +16,7 @@ def get_text_processing_obj():
         process_bilingual_data.Preprocess_Bilingual
     """
 
-    data_path: str = "../../../data/sample_data.tsv"
+    data_path: str = "data/sample_data.tsv"
     all_manga = pd.read_csv(data_path, sep="\t", index_col=0)
     all_manga = all_manga.drop(columns=["level_0"])
     pre_bi=process_bilingual_data.Preprocess_Bilingual()

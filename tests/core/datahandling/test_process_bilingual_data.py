@@ -2,7 +2,9 @@ import pytest
 import pandas as pd
 import sys
 
-sys.path.append("../../..")
+
+
+
 from core.datahandling import process_bilingual_data
 
 @pytest.fixture
@@ -12,7 +14,7 @@ def get_default_object():
     Returns:
         process_bilingual_data.Preprocess_Bilingual
     """
-    data_path: str = "../../../data/sample_data.tsv"
+    data_path: str = "data/sample_data.tsv"
     all_manga = pd.read_csv(data_path, sep="\t", index_col=0)
     all_manga = all_manga.drop(columns=["level_0"])
     pre_bi=process_bilingual_data.Preprocess_Bilingual()
@@ -25,7 +27,7 @@ def test_set_data():
     Returns:
 
     """
-    data_path: str = "../../../data/sample_data.tsv"
+    data_path: str = "data/sample_data.tsv"
     all_manga = pd.read_csv(data_path, sep="\t", index_col=0)
     all_manga = all_manga.drop(columns=["level_0"])
     pre_bi=process_bilingual_data.Preprocess_Bilingual()
