@@ -9,17 +9,15 @@ with optional cleaning, and translation.
 
 ##Prerequistes
 Currently, for core inference, this project has several requirements that are google cloud API dependent, and is expected to
-be embedded in a google compute instance. 
-<br>
-For UI setup see: [UI setup] (https://www.waferwire.com/blog/creating-a-virtual-machine-instance-with-google-cloud/)
-
-
-This requirements include access to google vision api, and google translate api. 
-However, there is functionality for testing, scraping data, and inital training outside of those
+be embedded in a google compute instance. This requirements include access to google vision api, and google translate api. 
+For setup: [UI setup](https://cloud.google.com/compute/docs/quickstart-linux) , 
+[Interfacing](https://cloud.google.com/compute/docs/ssh-in-browser)
+<br><br>
+Please note, there is functionality for scraping data, testing and inital training outside of those
 dependencies (see app_local.py, tests/)
 
 
-## Setup
+##Setup
 Clone your repository into your vm instance
 <br>
 <i>Run</i>:
