@@ -2,7 +2,7 @@ from extract_img_selenium import *
 from bs4 import BeautifulSoup
 import requests as req
 import pandas as pd
-from core.scrapping import extract_img_selenium
+from core.scraping import extract_img_selenium
 import urllib
 
 import os

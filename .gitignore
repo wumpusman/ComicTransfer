@@ -14,6 +14,7 @@ model-outputs
 *.jpeg
 !data/temp.png
 !sample_data.tsv
+!data/LiberationMono-Bold.ttf
 notebooks/
 *.ipynb_checkpoints
 .ipynb_checkpoints/*
