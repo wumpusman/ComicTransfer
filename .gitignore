@@ -13,6 +13,7 @@ model-outputs
 *.jpg
 *.jpeg
 !data/temp.png
+!sample_data.tsv
 notebooks/
 *.ipynb_checkpoints
 .ipynb_checkpoints/*

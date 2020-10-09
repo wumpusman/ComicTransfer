@@ -4,7 +4,7 @@ A pipeline for quick positioning and font realignment for Japanese Mangas to Eng
 ##Motivation
 The process of editing mangas between languages is a cumbersome process 
 that takes hours, and is primarily done manually.
-Specifically this project addresses an issue , automatically realigning text and positioning,
+Specifically this project focuses on automatically realigning text and positioning,
 with optional cleaning, and translation.
 
 ##Prerequistes
