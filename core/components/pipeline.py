@@ -2,13 +2,8 @@ from core.components.translation import predictor_translate
 from core.components.assignment import assign_ml
 from core.components.clean import clean_img
 from core.components.alignment import predict_jp_bounding
-from core.training.feature_engineering.traditional_feature_prediction import FeaturePredictionTraditional
-from core.training.feature_engineering.iou_prediction import PredictionBoundingTraditional
-import pandas as pd
 import numpy as np
 import pandas as pd
-import os
-import os
 import io
 import PIL.Image as Image
 import cv2
@@ -49,7 +44,7 @@ class PipeComponents():
         self._image_overlaid_text=None #image with text overlaid on it
         self._ran_once = False  # did it run once
         if font_path == "":
-            self._default_font_path='/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf'
+            self._default_font_path= '../../data/LiberationMono-Bold.ttf'
 
 
 
@@ -143,7 +138,7 @@ class PipeComponents():
             original_text: original transcripts if avalailable
 
         Returns:
-
+            None
         """
         self.clear_prev_estimates() ## clear results
         results_bounds_ocr:dict=self.extract_boundary_obj.predict_byte(bytestream)
@@ -174,22 +169,6 @@ class PipeComponents():
 
 
 
-if __name__ == '__main__':
-        image_path="../../data/007.png"
-        image_cv=cv2.imread(image_path,cv2.IMREAD_COLOR)
-
-        pipeline_obj=PipeComponents()
-
-        model_text_pth="../training/feature_engineering/temp2.pkl"
-        model_font_size_pth="../training/feature_engineering/temp1.pkl"
-        assign_obj=assign_ml.load_default_model(model_font_size_pth,model_text_pth)
-        pipeline_obj.set_assignment_model(assign_obj)
-
-        print("OK")
-        pipeline_obj.calculate_results_from_path(image_path)
-
-        print("done_temp")
-        #pipeline_obj.calculate_results()
 
 
 

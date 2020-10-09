@@ -33,7 +33,9 @@ class TranslationGoogle(TranslationDefault):
     def __init__(self,project_id,cache_results=False):
         """
         A wrapper for google image text bounding and ocr as a first pass
-   
+        Args:
+            project_id: a google api enabled project id - this project is expected to be run on the google cloud platform for specific privileges
+            cache_results: do you want to save a history of your results
         """
         super().__init__(None,cache_results)
         self.client = translate.TranslationServiceClient()
@@ -54,7 +56,7 @@ class TranslationGoogle(TranslationDefault):
         
         
     def translate_text(self,texts:list):
-        """Translating Text."""
+        """Translating Text"""
 
         client = self.client
 
