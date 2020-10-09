@@ -65,9 +65,6 @@ class FeaturePredictionTraditional():
 
     def predict(self,data:list,preprocess:bool=False)->list:
         """
-        Returns:
-
-        """"""
             makes general predictions on unprocessed data, make sure to call preprocess 
         Args:
             data: a multi dimensional array representing data points, it assumes it hasn't been scaled or processed
@@ -104,7 +101,7 @@ class FeaturePredictionTraditional():
             dev_x = self.preprocess(dev_x)
 
 
-            self.fit(tr_x, tr_y,False) #this preprocesses the data
+            self.fit(tr_x, tr_y,False) #this optionally prepocesses the data
 
 
 
@@ -162,81 +159,3 @@ def load(load_path:str)->object:
         object
     """
     return joblib.load(load_path)
-
-
-if __name__ == '__main__':
-
-    files_of_interest=["Yokohama_Shopping_Trip_selenium.tsv",
-                       "Toradora!_selenium.tsv",
-                       "Rokuhoudou_Yotsuiro_Biyori_selenium.tsv",
-                       "Kekkonshite_mo_Koishiteru_selenium.tsv"
-                       ]
-
-
-    all_manga_pds=[]
-    data_path= "/home/jupyter/ComicTransfer/data/bilingual_tsv" #"C://Users//egasy//Downloads//ComicTransfer//ComicTransfer//ExtractBilingual/bi/"
-    data_name="Doraemon_Long_Stories_selenium.tsv"
-
-    for name in files_of_interest:
-        full_path=os.path.join(data_path,name)
-
-        all_manga=pd.read_csv(full_path,sep="\t",index_col=0)
-        all_manga=all_manga.drop(columns=["level_0"])
-        all_manga_pds.append(all_manga)
-    print("OK")
-    all_manga=pd.concat(all_manga_pds)
-    process=Preprocess_Bilingual()
-    process.set_data(all_manga)
-
-    
-    box_area=process.extract_box_area()
-    text_len=process.extract_text_length()
-    font_size = process.extract_font_size()
-
-
-    original_data = process.aggregate_to_pandas((box_area, text_len, font_size))
-    ##set features
-
-    from sklearn.ensemble import RandomForestRegressor
-
-    model = FeaturePredictionTraditional()
-
-    model.set_model(RandomForestRegressor(max_depth=5,random_state=0))
-
-    box_area = process.extract_box_area()
-    text_len = process.extract_text_length()
-    font_size = process.extract_font_size()
-
-    original_data = process.aggregate_to_pandas((box_area, text_len, font_size))
-
-    model.set_data(original_data)
-
-    x_features = ["width_jp", "height_jp", "text_jp_len"]
-    y_features = ["font-size_en"]
-    model.set_features(x_features, y_features)
-
-    print(model.score_cv())
-
-    tr_scores, dev_scores = model.score_cv()
-
-    assert (np.mean(tr_scores) - 3.0) < .05, "small font distribution"
-
-    model.fit(model._x, model._y, preprocess=True)
-
-    ex1_results=model.predict(model._x, preprocess=True)
-    bad_ex1_results = model.predict(model._x, preprocess=False)
-
-    score_good=model.score(ex1_results,model._y)
-    score_bad=model.score(bad_ex1_results, model._y)
-
-    assert score_good < 4.5, "scaled data before running"
-    assert score_bad > 3.5, "did not scale data before running "
-
-    save(model, "../training/feature_engineering/temp1.pkl")
-
-    model2=load("../training/feature_engineering/temp1.pkl")
-    assert ex1_results[0]==model2.predict(model._x,preprocess=True)[0]
-    print("Ok")
-    #bounding box normalize
-    #text len jp
-    #text len english

@@ -11,14 +11,15 @@ from core.components.assignment import assign_ml
 from core.components import pipeline
 
 default_image_path:str="../data/temp.png"
-default_font_model_pth="training/feature_engineering/temp1.pkl"
-default_bound_model_pth="training/feature_engineering/temp2.pkl"
+default_font_model_pth="../data/models/font_model.pkl"
+default_bound_model_pth="../data/models/bounding_model.pkl"
+default_font_pth='../data/LiberationMono-Bold.ttf'
 default_save_dir="../data/results/"
 default_project_id="typegan"
 
 parser = argparse.ArgumentParser(description='sample for running the converter with default')
 parser.add_argument("-p","--file_path",help="path to a jpg or png",default=default_image_path)
-parser.add_argument("-f","--font_path",help="path to font to be used",default='../data/LiberationMono-Bold.ttf')
+parser.add_argument("-f","--font_path",help="path to font to be used",default=default_font_pth)
 parser.add_argument("-s","--model_font_size",help="path to model for font size",default=default_font_model_pth)
 parser.add_argument("-b","--model_bounding_box",help="path to model for bounding box",default=default_bound_model_pth)
 parser.add_argument("-i","--project_id",help="project id associated with a project that has permission for google services",default=default_project_id)
@@ -50,7 +51,7 @@ def main(project_id:str,image_path:str,destination:str,font_path:str,font_model_
     image_to_draw= Image.fromarray(pipeline_obj._image_overlaid_text)
 
 
-    image_to_draw.save(os.path.join(destination,"img_overlay.png"))
+    image_to_draw.save(os.path.join(destination,"img_overlay1.png"))
 
 if __name__ == '__main__':
     args = parser.parse_args()

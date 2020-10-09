@@ -82,8 +82,8 @@ class AssignTextML(assign_text.AssignDefault):
         return np.asarray(image)
     
 
-def load_default_model(model_font_pth="core/training/feature_engineering/temp1.pkl",
-                       model_box_pth="core/training/feature_engineering/temp2.pkl"):
+def load_default_model(model_font_pth="data/models/font_model.pkl",
+                       model_box_pth="data/models/bounding_model.pkl"):
     """
     function for quickly loading a model with predefined paths
     Args:
@@ -96,8 +96,7 @@ def load_default_model(model_font_pth="core/training/feature_engineering/temp1.p
 
     m1= traditional_feature_prediction.load((model_font_pth))
     m2= traditional_feature_prediction.load((model_box_pth))
-    print(m1._x_names)
-    print(m2._x_names)
+
     aML=AssignTextML()
     aML.set_font_model(m1)
     aML.set_location_model(m2)

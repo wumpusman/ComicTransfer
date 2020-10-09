@@ -372,7 +372,15 @@ class Preprocess_Bilingual():
         return pd.concat([jp_data,en_data],axis=1).to_dict()
 
     def extract_squared_features(self, normalize:bool=True)->dict:
+        """
+        extracts squared values of features, this is simply a way to ascertain if there is a more curved relationship between dimensions of
+        japanese bounding boxes and english bounding boxes
+        Args:
+            normalize: normalize the results with respect to the page size
 
+        Returns:
+            dict
+        """
 
         jp_area=pd.DataFrame(self.extract_box_area(normalize))[["width_jp","height_jp"]]
         jp_area=jp_area*jp_area

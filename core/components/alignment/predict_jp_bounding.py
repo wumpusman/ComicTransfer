@@ -71,7 +71,7 @@ class BoundingGoogle(BoundingDefault):
         all_results_pd.columns=names
         all_results_pd=Preprocess_Bilingual.convert_features_from_raw_page(all_results_pd)
 
-        print("IT's fine")
+
         #print(all_results_pd.values)
         return all_results_pd
 
@@ -95,7 +95,7 @@ class BoundingGoogle(BoundingDefault):
         content=img_bytestream.read()
         image  = vision.Image(content=content)
 
-        print(type(image))
+
         response = client.document_text_detection(image=image)
 
 

@@ -54,7 +54,7 @@ def get_iou(bb1:dict, bb2:dict)->float:
 
 def get_iou_lists(l1:list,l2:list)->float:
     """
-
+    does iou lists instead of raw components
     Args:
         l1: list of values x1,y1,x2,y2
         l2: list of values x1,y1,x2,y2

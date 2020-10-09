@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression
 import argparse
 
 default_path_tsv= "../../data/bilingual_tsv"
-save_model_path= "feature_engineering/temp2.pkl"
+save_model_path= "../../data/models/bounding_model.pkl"
 save_model:bool=True
 run_ablation:bool=False
 model_type:str="bound"
