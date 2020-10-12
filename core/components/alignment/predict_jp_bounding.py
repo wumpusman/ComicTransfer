@@ -11,7 +11,7 @@ class BoundingDefault():
         essentially a default abstract class for dealing with manga
         """
         self._estimator = estimator
-        self._language: str = "ja"  # lagnauge that this model is eexpected to be bounding
+        self._language: str = "ja"  # language that this model is expected to be bounding
         # am i gonna store the original unclean data
         self._should_cache: bool = cache_results
         self._cache = []  # a temporary cache of previously stored results

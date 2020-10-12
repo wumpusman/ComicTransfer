@@ -46,13 +46,9 @@ class FeaturePredictionTraditional():
     def set_model(self, model: object):
         self._model = model
 
-    def set_features(
-            self,
-            x_names: list = [
-                "width_jp",
-                "height_jp",
-                "text_jp_len"],
-            y_names: list = ["font-size_en"]):
+    def set_features(self,
+                     x_names: list = ["width_jp", "height_jp", "text_jp_len"],
+                     y_names: list = ["font-size_en"]):
         """
         define the features you're going to select, this assumes *optionally* multi-outputs
         Args:

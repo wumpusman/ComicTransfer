@@ -9,13 +9,13 @@ from core.models.traditional_feature_prediction import FeaturePredictionTraditio
 from core.models import traditional_feature_prediction
 from core.components.assignment import assign_text
 
+
 class AssignTextML(assign_text.AssignDefault):
     """
     Attributes:
         _model_font_size: a model for estimating font size, this is typically set via set_font_model
         _model_location: a model for determining where to center and size the boudning box, typically set via set_location_model
     """
-
     def __init__(self):
         """
             extension of assign ml that incorporates models for predicting bounding boxes and font size
@@ -46,12 +46,8 @@ class AssignTextML(assign_text.AssignDefault):
         """
         self._model_location = model
 
-    def assign_all(
-            self,
-            image_cv: np.array,
-            texts: list,
-            data: pd.DataFrame,
-            font_path: str) -> np.array:
+    def assign_all(self, image_cv: np.array, texts: list, data: pd.DataFrame,
+                   font_path: str) -> np.array:
         """
             assigns text to bounding locations using limited heuristics
         Args:
@@ -71,8 +67,8 @@ class AssignTextML(assign_text.AssignDefault):
         box_predictions: list = self._model_location.predict(
             data[self._model_location._x_names], True).astype(int)
 
-        for text, font_size, box in zip(
-                texts, font_sizes_pred, box_predictions):
+        for text, font_size, box in zip(texts, font_sizes_pred,
+                                        box_predictions):
 
             xmin, ymin, xmax, ymax = box[0], box[1], box[2], box[3]
             font = ImageFont.truetype(font_path, font_size)
@@ -84,8 +80,10 @@ class AssignTextML(assign_text.AssignDefault):
             updated_font_size = int((font_size * .5 + updated_font_size * .5))
             self._estimated_sizes.append(updated_font_size)
             font = ImageFont.truetype(font_path, updated_font_size)
-            draw.text([xmin + 3, ymin], "\n".join(realigned_text),
-                      font=font, fill=(0, 0, 0, 255))
+            draw.text([xmin + 3, ymin],
+                      "\n".join(realigned_text),
+                      font=font,
+                      fill=(0, 0, 0, 255))
 
         return np.asarray(image)
 
@@ -109,4 +107,3 @@ def load_default_model(model_font_pth="data/models/font_model.pkl",
     aML.set_font_model(m1)
     aML.set_location_model(m2)
     return aML
-

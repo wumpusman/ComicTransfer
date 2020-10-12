@@ -22,9 +22,7 @@ def create_web_driver(path="chromedriver"):
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument("--window-size=4000,3000")
-    return webdriver.Chrome(
-        path,
-        options=chrome_options)
+    return webdriver.Chrome(path, options=chrome_options)
 
 
 def find_next_link(driver):
@@ -38,7 +36,7 @@ def find_next_link(driver):
     """
     buttons = driver.find_elements_by_class_name("btn-control-container")[0]
     buttons = buttons.find_elements_by_tag_name("a")
-    if(len(buttons) < 2):
+    if (len(buttons) < 2):
         return []
     else:
         return [buttons[1].get_attribute("href")]

@@ -3,7 +3,6 @@ from core.models import iou_prediction
 
 
 class PredictionBoundingSeparate(iou_prediction.PredictionBoundingTraditional):
-
     def __init__(self):
         """
         Predicts bounding but estimates x,y, width and height separately as opposed to x,y,x1,y2
@@ -44,16 +43,9 @@ class PredictionBoundingSeparate(iou_prediction.PredictionBoundingTraditional):
         return super().score(predicted, ground_truth)
 
     def set_features(
-        self,
-        x_names: list = [
-            "top_jp",
-            "left_jp",
-            "width_jp",
-            "height_jp",
-            "text_jp_len"],
-        y_names: list = [
-            "left_en",
-            'top_en',
-            "width_en",
-            "height_en"]):
+            self,
+            x_names: list = [
+                "top_jp", "left_jp", "width_jp", "height_jp", "text_jp_len"
+            ],
+            y_names: list = ["left_en", 'top_en', "width_en", "height_en"]):
         super().set_features(x_names, y_names)

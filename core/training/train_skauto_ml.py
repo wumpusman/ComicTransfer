@@ -1,17 +1,14 @@
-
-
 import argparse
 import os
 import sys
-import autosklearn.regression
 import sklearn.model_selection
 import sklearn.datasets
 import sklearn.metrics
 import sklearn
+from deprecated import deprecated
 sys.path.append("../")
 from core.datahandling import process_bilingual_data
 from core.models import iou_prediction
-
 
 DEFAULT_PATH_TSV = "../../data/bilingual_tsv"
 RESULTS_SAVE_PATH = "/tmp/simple_evaluation"
@@ -20,33 +17,31 @@ PER_MODEL_TIME = 30
 
 parser = argparse.ArgumentParser(
     description='setup for training models for bounding using automl')
-parser.add_argument(
-    "-d",
-    "--datadir",
-    help="path to tsv files",
-    default=DEFAULT_PATH_TSV)
-parser.add_argument(
-    "-s",
-    "--savepath",
-    help="where to save outputs",
-    default=RESULTS_SAVE_PATH)
-parser.add_argument(
-    "-t",
-    "--maxtime",
-    help="max time to run in general",
-    default=MAX_TIME)
-parser.add_argument(
-    "-p",
-    "--maxtime_model",
-    help="max time per model in seconds",
-    default=PER_MODEL_TIME)
+parser.add_argument("-d",
+                    "--datadir",
+                    help="path to tsv files",
+                    default=DEFAULT_PATH_TSV)
+parser.add_argument("-s",
+                    "--savepath",
+                    help="where to save outputs",
+                    default=RESULTS_SAVE_PATH)
+parser.add_argument("-t",
+                    "--maxtime",
+                    help="max time to run in general",
+                    default=MAX_TIME)
+parser.add_argument("-p",
+                    "--maxtime_model",
+                    help="max time per model in seconds",
+                    default=PER_MODEL_TIME)
 
 
-def main(
-        dir_path: str,
-        save_path: str,
-        max_run_time: int,
-        max_run_per_model: int):
+@deprecated(
+    version="1.0",
+    reason=
+    "package this is dependent on is unstable, may be reintegrated in the future"
+)
+def main(dir_path: str, save_path: str, max_run_time: int,
+         max_run_per_model: int):
     """
     runs through automl sklearn for hyperparameter and model search
     Args:
@@ -58,6 +53,8 @@ def main(
     Returns:
         None
     """
+
+    import autosklearn.regression
     files: list = os.listdir(dir_path)
     file_names: list = [i for i in dir_path if ("selenium.tsv" in i)]
     full_path: str = [os.path.join(dir_path, name) for name in files]
@@ -78,10 +75,9 @@ def main(
         tmp_folder=save_path + "_temp",
         output_folder=save_path,
     )
-    final_model = automl.fit(
-        x_train,
-        y_train,
-        dataset_name="tsv of manga for iou prediction")
+    final_model = automl.fit(x_train,
+                             y_train,
+                             dataset_name="tsv of manga for iou prediction")
 
     y_test_pred = final_model.predict(x_test)
     total_score = 0

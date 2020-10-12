@@ -35,7 +35,6 @@ class Preprocess_Bilingual():
     Attributes:
         _data_to_process: the original data in tsv format that was scraped
     """
-
     def __init__(self):
         """
         Preprocesses data for downstream tasks to be used for basic model analysis
@@ -59,23 +58,11 @@ class Preprocess_Bilingual():
         """
 
         expected_minimum_feature_names = [
-            'width_jp',
-            'height_jp',
-            'top_jp',
-            'left_jp',
-            'x1_jp',
-            'y1_jp',
-            'x2_jp',
-            'y2_jp',
-            'text_jp_len',
-            'nn1',
-            'nn2',
-            'box_num',
-            'x1_jp_squared',
-            'y1_jp_squared',
-            'x2_jp_squared',
-            'y2_jp_squared',
-            'width_jp_squared']
+            'width_jp', 'height_jp', 'top_jp', 'left_jp', 'x1_jp', 'y1_jp',
+            'x2_jp', 'y2_jp', 'text_jp_len', 'nn1', 'nn2', 'box_num',
+            'x1_jp_squared', 'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
+            'width_jp_squared'
+        ]
 
         Preprocess_Bilingual._add_meta_information(page_data)
 
@@ -83,10 +70,8 @@ class Preprocess_Bilingual():
         squared = squared * squared
         squared = pd.DataFrame(squared.values)
         squared.columns = [
-            'x1_jp_squared',
-            'y1_jp_squared',
-            'x2_jp_squared',
-            'y2_jp_squared']
+            'x1_jp_squared', 'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared'
+        ]
 
         jp_area = page_data[['width_jp', 'height_jp']]
         jp_area = jp_area * jp_area
@@ -104,11 +89,12 @@ class Preprocess_Bilingual():
         Returns:
             tuple
         """
-        x_feature_names = ['width_jp', 'height_jp', 'top_jp', 'left_jp',
-                           'x1_jp', 'y1_jp', 'x2_jp', 'y2_jp', 'text_jp_len',
-                           'nn1', 'nn2', 'box_num', 'x1_jp_squared',
-                           'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
-                           'width_jp_squared']
+        x_feature_names = [
+            'width_jp', 'height_jp', 'top_jp', 'left_jp', 'x1_jp', 'y1_jp',
+            'x2_jp', 'y2_jp', 'text_jp_len', 'nn1', 'nn2', 'box_num',
+            'x1_jp_squared', 'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
+            'width_jp_squared'
+        ]
 
         y_feature_names = ['font-size_en']
 
@@ -126,11 +112,12 @@ class Preprocess_Bilingual():
         Returns:
             tuple
         """
-        x_feature_names = ['width_jp', 'height_jp', 'top_jp', 'left_jp',
-                           'x1_jp', 'y1_jp', 'x2_jp', 'y2_jp', 'text_jp_len',
-                           'nn1', 'nn2', 'box_num', 'x1_jp_squared',
-                           'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
-                           'width_jp_squared']
+        x_feature_names = [
+            'width_jp', 'height_jp', 'top_jp', 'left_jp', 'x1_jp', 'y1_jp',
+            'x2_jp', 'y2_jp', 'text_jp_len', 'nn1', 'nn2', 'box_num',
+            'x1_jp_squared', 'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
+            'width_jp_squared'
+        ]
 
         y_feature_names = ['x1_en', 'y1_en', 'x2_en', 'y2_en']
 
@@ -149,11 +136,12 @@ class Preprocess_Bilingual():
             pd.DataFrame
         """
 
-        X_feature_names = ['width_jp', 'height_jp', 'top_jp', 'left_jp',
-                           'x1_jp', 'y1_jp', 'x2_jp', 'y2_jp', 'text_jp_len',
-                           'nn1', 'nn2', 'box_num', 'x1_jp_squared',
-                           'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
-                           'width_jp_squared', 'font-size_jp']
+        X_feature_names = [
+            'width_jp', 'height_jp', 'top_jp', 'left_jp', 'x1_jp', 'y1_jp',
+            'x2_jp', 'y2_jp', 'text_jp_len', 'nn1', 'nn2', 'box_num',
+            'x1_jp_squared', 'y1_jp_squared', 'x2_jp_squared', 'y2_jp_squared',
+            'width_jp_squared', 'font-size_jp'
+        ]
 
         y_feature_names = ['x1_en', 'y1_en', 'x2_en', 'y2_en']
 
@@ -165,15 +153,10 @@ class Preprocess_Bilingual():
         neighbors_and_boxes_on_page = self.extract_macro_features()
         squared_features = self.extract_squared_features(normalize)
 
-        pd_features = self.aggregate_to_pandas(
-            [
-                box_area,
-                box_location,
-                box_coords,
-                text_info,
-                font_size,
-                neighbors_and_boxes_on_page,
-                squared_features])
+        pd_features = self.aggregate_to_pandas([
+            box_area, box_location, box_coords, text_info, font_size,
+            neighbors_and_boxes_on_page, squared_features
+        ])
 
         return pd_features
 
@@ -201,7 +184,8 @@ class Preprocess_Bilingual():
         Returns:
             None
         """
-        if ("link" in original_data_frame.columns) == False:  # in case there is no link such as when predicting
+        if ("link" in original_data_frame.columns
+            ) == False:  # in case there is no link such as when predicting
             original_data_frame["link"] = "empty"
 
         coords_names = ["x1_jp", "y1_jp", "x2_jp", "y2_jp"]
@@ -217,8 +201,8 @@ class Preprocess_Bilingual():
             # check if coords already exist
 
             coords = None
-            coords_exist = all(
-                elem in original_data_frame.columns for elem in coords_names)
+            coords_exist = all(elem in original_data_frame.columns
+                               for elem in coords_names)
             if not coords_exist:
                 coords = pd.DataFrame(temp_process.to_box_coords(False))
             else:
@@ -271,10 +255,11 @@ class Preprocess_Bilingual():
 
         japanese = manga_pd[manga_pd.language == "jp"]
         english = manga_pd[manga_pd.language == "en"]
-        aligned_data = pd.merge(
-            japanese, english, how="inner", on=[
-                "manga", "link", "boxID", "id"], suffixes=(
-                "_jp", "_en"))
+        aligned_data = pd.merge(japanese,
+                                english,
+                                how="inner",
+                                on=["manga", "link", "boxID", "id"],
+                                suffixes=("_jp", "_en"))
         return aligned_data
 
     def extract_text(self) -> dict:
@@ -350,10 +335,9 @@ class Preprocess_Bilingual():
 
         return new.to_dict()
 
-    def _to_box_coords(
-            self,
-            lang="jp",
-            normalize: bool = True) -> pd.DataFrame:
+    def _to_box_coords(self,
+                       lang="jp",
+                       normalize: bool = True) -> pd.DataFrame:
         """
             takes in size and offset and makes into x1,x2,y1,y2 format (top left, bottom right)
         Args:
@@ -371,7 +355,8 @@ class Preprocess_Bilingual():
 
         lang_area = area[["width_{}".format(lang), "height_{}".format(lang)]]
         lang_location = location[[
-            "left_{}".format(lang), "top_{}".format(lang)]]
+            "left_{}".format(lang), "top_{}".format(lang)
+        ]]
 
         bottom_right = lang_area.values + lang_location.values
         bottom_right_pd = pd.DataFrame(bottom_right)
@@ -411,19 +396,18 @@ class Preprocess_Bilingual():
             dict
         """
 
-        jp_area = pd.DataFrame(self.extract_box_area(normalize))[
-            ["width_jp", "height_jp"]]
+        jp_area = pd.DataFrame(
+            self.extract_box_area(normalize))[["width_jp", "height_jp"]]
         jp_area = jp_area * jp_area
         jp_area.columns = ["width_jp_squared", "height_jp_squared"]
 
-        jp_loc = pd.DataFrame(self.to_box_coords(normalize))[
-            ["x1_jp", "y1_jp", "x2_jp", "y2_jp"]]
+        jp_loc = pd.DataFrame(self.to_box_coords(normalize))[[
+            "x1_jp", "y1_jp", "x2_jp", "y2_jp"
+        ]]
         jp_loc = jp_loc * jp_loc
         jp_loc.columns = [
-            "x1_jp_squared",
-            "y1_jp_squared",
-            "x2_jp_squared",
-            "y2_jp_squared"]
+            "x1_jp_squared", "y1_jp_squared", "x2_jp_squared", "y2_jp_squared"
+        ]
 
         return pd.concat([jp_loc, jp_area], axis=1).to_dict()
 
@@ -532,8 +516,8 @@ if __name__ == '__main__':
     assert (int(temp["box_num"][0]) == 6)
 
     temp = pd.DataFrame((pre_bi.extract_squared_features(False)))
-    assert(int(temp["x1_jp_squared"][0]) == (410881))
-    assert(int(temp["height_jp_squared"][1] == (5184)))
+    assert (int(temp["x1_jp_squared"][0]) == (410881))
+    assert (int(temp["height_jp_squared"][1] == (5184)))
 
     temp = pre_bi.output_all_features()
     x, y = pre_bi.output_all_features_font_size()

@@ -4,7 +4,6 @@ import pandas as pd
 import urllib
 from core.scraping import extract_img_selenium
 
-
 import os
 import time
 
@@ -71,8 +70,10 @@ def parse_soup_page(soup, link=""):
     jp_dict = {}
     eng_dict = {}
 
-    eng_dict = extract_dictionary(
-        eng_text, {"language": "english", "manga": manga})
+    eng_dict = extract_dictionary(eng_text, {
+        "language": "english",
+        "manga": manga
+    })
 
     jp_dict = extract_dictionary(jp_text, {"language": "jp", "manga": manga})
 
@@ -112,7 +113,8 @@ def get_link(soup):
 def extract_manga(link, save_dir="/home/data/bilingual/"):
     all_frames = pd.DataFrame()
     for i in range(
-            3000):  # time out if a manga has greater than 3k images in it ((usually around 150 - 200)
+            3000
+    ):  # time out if a manga has greater than 3k images in it ((usually around 150 - 200)
         last_link = link
         resp = req.get(link)
         soup = BeautifulSoup(resp.text, 'lxml')

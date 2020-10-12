@@ -15,12 +15,8 @@ def get_iou(bb1: dict, bb2: dict) -> float:
         float
     """
 
-    try:
-        assert bb1['x1'] < bb1['x2']
-        assert bb1['y1'] < bb1['y2']
-        assert bb2['x1'] < bb2['x2']
-        assert bb2['y1'] < bb2['y2']
-    except:
+    if ((bb1['x1'] < bb1['x2']) or (bb1['y1'] < bb1['y2'])
+            or (bb2['x1'] < bb2['x2']) or (bb2['y1'] < bb2['y2'])) == False:
         return 0  # if predictions are off return failure
 
     # determine the coordinates of the intersection rectangle
@@ -66,7 +62,6 @@ def get_iou_lists(l1: list, l2: list) -> float:
 
 
 class PredictionBoundingTraditional(FeaturePredictionTraditional):
-
     def __init__(self):
         """
         Same as prediction bounding, but uses IOU metric and assumes output of the form
@@ -75,19 +70,12 @@ class PredictionBoundingTraditional(FeaturePredictionTraditional):
 
         super().__init__()
 
-    def set_features(
-        self,
-        x_names: list = [
-            "top_jp",
-            "left_jp",
-            "width_jp",
-            "height_jp",
-            "text_jp_len"],
-        y_names: list = [
-            'x1_en',
-            'y1_en',
-            'x2_en',
-            'y2_en']):
+    def set_features(self,
+                     x_names: list = [
+                         "top_jp", "left_jp", "width_jp", "height_jp",
+                         "text_jp_len"
+                     ],
+                     y_names: list = ['x1_en', 'y1_en', 'x2_en', 'y2_en']):
         """
         sets features with the one expectation that output y features are x1,y1,x2,y2 format
         Args:

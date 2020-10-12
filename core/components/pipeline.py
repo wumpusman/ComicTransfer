@@ -25,7 +25,6 @@ class PipeComponents():
         _ran_once: did this system go through dataset at least once
 
     """
-
     def __init__(self, project_id="typegan", font_path: str = ""):
         """
         pipeline that is meant to encapsulate the different aspects of the current system
@@ -114,10 +113,9 @@ class PipeComponents():
         self._image_text_mask = None
         self._image_overlaid_text = None
 
-    def calculate_results_from_path(
-            self,
-            img_path: str,
-            original_text: list = []):
+    def calculate_results_from_path(self,
+                                    img_path: str,
+                                    original_text: list = []):
         """
         calculates results of pipeline based on an image path and optional associated transcript
         results are stored internally
@@ -162,20 +160,16 @@ class PipeComponents():
         self._image_text_mask = np.copy(np.asarray(self._image_cleaned))
         self._image_text_mask[:, :, :] = 0
         self._image_text_mask = self.assign_obj.assign_all(
-            self._image_text_mask,
-            translation_en,
-            formatted_bounds_ocr,
+            self._image_text_mask, translation_en, formatted_bounds_ocr,
             self._default_font_path)
 
         self._image_overlaid_text = self.assign_obj.assign_all(
-            self._image_cleaned,
-            translation_en,
-            formatted_bounds_ocr,
+            self._image_cleaned, translation_en, formatted_bounds_ocr,
             self._default_font_path)
 
         self._data_estimates = pd.DataFrame()
         self._data_estimates["jp_text"] = original_jp_text
         self._data_estimates["en_trans"] = translation_en
-        self._data_estimates["font_prediction"] = self.assign_obj.get_estimate_font_size(
-        )
+        self._data_estimates[
+            "font_prediction"] = self.assign_obj.get_estimate_font_size()
         self._ran_once = True

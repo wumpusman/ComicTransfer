@@ -1,4 +1,3 @@
-
 import argparse
 import os
 import sys
@@ -15,26 +14,22 @@ MODEL_TYPE: str = "bound"
 
 parser = argparse.ArgumentParser(
     description='setup for training models, as well as simple ablations')
-parser.add_argument(
-    "-d",
-    "--datadir",
-    help="path to tsv files",
-    default=DEFAULT_PATH_TSV)
-parser.add_argument(
-    "-m",
-    "--savepath",
-    help="path to save the model",
-    default=SAVE_MODEL_PATH)
-parser.add_argument(
-    "-s",
-    "--savemodel",
-    help="save the model",
-    default=SAVE_MODEL)
-parser.add_argument(
-    "-a",
-    "--ablate",
-    help="run and output simple ablations",
-    default=RUN_ABLATION)
+parser.add_argument("-d",
+                    "--datadir",
+                    help="path to tsv files",
+                    default=DEFAULT_PATH_TSV)
+parser.add_argument("-m",
+                    "--savepath",
+                    help="path to save the model",
+                    default=SAVE_MODEL_PATH)
+parser.add_argument("-s",
+                    "--savemodel",
+                    help="save the model",
+                    default=SAVE_MODEL)
+parser.add_argument("-a",
+                    "--ablate",
+                    help="run and output simple ablations",
+                    default=RUN_ABLATION)
 parser.add_argument(
     "-t",
     "--type",
@@ -42,12 +37,11 @@ parser.add_argument(
     default=MODEL_TYPE)
 
 
-def main(
-        model_type: str,
-        dir_path,
-        save_path: str = "temp.pkl",
-        save_model: bool = False,
-        run_ablation: bool = False):
+def main(model_type: str,
+         dir_path,
+         save_path: str = "temp.pkl",
+         save_model: bool = False,
+         run_ablation: bool = False):
     """
     runs basic model training, and simple ablation if using non-linear models
     Args:
@@ -88,7 +82,8 @@ def main(
         x_names = x_pd.columns.values
         y_names = y_pd.columns.values
 
-        prediction_wrapper = traditional_feature_prediction.FeaturePredictionTraditional()
+        prediction_wrapper = traditional_feature_prediction.FeaturePredictionTraditional(
+        )
         prediction_wrapper.set_data(all_data)
         prediction_wrapper.set_features(x_names, y_names)
 
@@ -109,10 +104,9 @@ def main(
 
     if save_model:
 
-        prediction_wrapper.fit(
-            prediction_wrapper._x,
-            prediction_wrapper._y,
-            preprocess=True)
+        prediction_wrapper.fit(prediction_wrapper._x,
+                               prediction_wrapper._y,
+                               preprocess=True)
         traditional_feature_prediction.save(prediction_wrapper, save_path)
 
 

@@ -2,7 +2,6 @@ from google.cloud import translate
 
 
 class TranslationDefault():
-
     """
     Attributes:
         estimator: an object that down the line can help with reassigning text prediction given provided translations
@@ -10,7 +9,6 @@ class TranslationDefault():
         _language: what language are you translating
         _cache: array to  temporary store ressults
     """
-
     def __init__(self, estimator=None, cache_results=False):
         """
         Wrapper class that just defaults for japanese to english
@@ -32,7 +30,6 @@ class TranslationGoogle(TranslationDefault):
         client: client object from google services
         _project_id: an id identifyign a google project, required at a minimum
     """
-
     def __init__(self, project_id, cache_results=False):
         """
         A wrapper for google image text bounding and ocr as a first pass
@@ -74,6 +71,5 @@ class TranslationGoogle(TranslationDefault):
             mime_type="text/plain",  # mime types: text/plain, text/html
             source_language_code=src,
             target_language_code=target,
-
         )
         return response

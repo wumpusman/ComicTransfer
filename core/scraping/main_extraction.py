@@ -14,37 +14,34 @@ manga_files_path = "../data/manga_list.txt"
 max_pages = 3
 
 parser = argparse.ArgumentParser(description='running extraction code')
-parser.add_argument(
-    "-d",
-    "--driver_path",
-    help="path to chrome driver",
-    default=driver_path)
-parser.add_argument(
-    "-s",
-    "--save_dir",
-    help="path to save files and images",
-    default=save_dir)
+parser.add_argument("-d",
+                    "--driver_path",
+                    help="path to chrome driver",
+                    default=driver_path)
+parser.add_argument("-s",
+                    "--save_dir",
+                    help="path to save files and images",
+                    default=save_dir)
 parser.add_argument(
     "-m",
     "--manga_list",
-    help="path to list of urls with each line referencing a link to one page per different manga",
+    help=
+    "path to list of urls with each line referencing a link to one page per different manga",
     default=manga_files_path)
-parser.add_argument(
-    "-n",
-    "--number_per_manga",
-    help="max number of pages to attempt to save per page",
-    default=int(max_pages),
-    type=int)
+parser.add_argument("-n",
+                    "--number_per_manga",
+                    help="max number of pages to attempt to save per page",
+                    default=int(max_pages),
+                    type=int)
 
 # python scraping/main_extraction.py -m "../data/manga_list.txt"
 # --number_per_manga 3
 
 
-def main(
-        driver_path: str,
-        save_dir: str,
-        manga_list_pth: str,
-        max_pages_per_manga=1000):
+def main(driver_path: str,
+         save_dir: str,
+         manga_list_pth: str,
+         max_pages_per_manga=1000):
     """
     used to extract manga meta data and images specified in in the mangalist each line refers to a page in a different manga
     Args:
@@ -91,8 +88,8 @@ def main(
                 pd_results["id"] = img_number
                 all_frames = all_frames.append(pd_results)
                 full_path = os.path.join(save_dir, manga_name)
-                extract_img_selenium.save_eng_jp_pairs(
-                    driver, current_link, full_path, img_number)
+                extract_img_selenium.save_eng_jp_pairs(driver, current_link,
+                                                       full_path, img_number)
 
             except BaseException:
                 print("problem at {}".format(current_link))
@@ -103,9 +100,8 @@ def main(
 
             if len(next_link_ary) == 0 or current >= max_pages_per_manga:
                 all_frames = all_frames.drop("level_0", axis=1).reset_index()
-                tsv_to_save = os.path.join(
-                    save_dir, "{}{}".format(
-                        manga_name, ".tsv"))
+                tsv_to_save = os.path.join(save_dir,
+                                           "{}{}".format(manga_name, ".tsv"))
                 all_frames.to_csv(tsv_to_save, sep="\t")
                 break
 
@@ -115,8 +111,5 @@ def main(
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    main(
-        args.driver_path,
-        args.save_dir,
-        args.manga_list,
-        args.number_per_manga)
+    main(args.driver_path, args.save_dir, args.manga_list,
+         args.number_per_manga)

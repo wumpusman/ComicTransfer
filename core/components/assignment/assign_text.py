@@ -4,12 +4,8 @@ import pandas as pd
 import math
 
 
-def calc_font_size(
-        xmin: int,
-        xmax: int,
-        ymin: int,
-        ymax: int,
-        text: str) -> int:
+def calc_font_size(xmin: int, xmax: int, ymin: int, ymax: int,
+                   text: str) -> int:
     """
     heuristic for estimating font size
     """
@@ -49,8 +45,8 @@ def text_wrap(text: str, font: object, max_width: int) -> list:
         # width
         while i < len(words):
             line = ''
-            while i < len(words) and font.getsize(
-                    line + words[i])[0] <= max_width:
+            while i < len(words) and font.getsize(line +
+                                                  words[i])[0] <= max_width:
                 line = line + words[i] + " "
                 i += 1
             if not line:
@@ -65,7 +61,6 @@ class AssignDefault():
     Attributes:
         _estimate_sizes: a list of predicted font sizes based on predicted
     """
-
     def __init__(self):
         """
         the simplest most heuristic way for figuring out where text is
@@ -75,12 +70,8 @@ class AssignDefault():
     def get_estimate_font_size(self):
         return self._estimated_sizes
 
-    def assign_all(
-            self,
-            image_cv: np.array,
-            texts: list,
-            data: pd.DataFrame,
-            font_path: str) -> np.array:
+    def assign_all(self, image_cv: np.array, texts: list, data: pd.DataFrame,
+                   font_path: str) -> np.array:
         """
             assigns text to bounding locations using limited heuristics
         Args:
@@ -106,12 +97,14 @@ class AssignDefault():
             font = ImageFont.truetype(font_path, size)
             realigned_text = text_wrap(text, font, xmax - xmin)
 
-            updated_font_size = calc_font_size(
-                xmin, xmax, ymin, ymax, "\n".join(realigned_text))
+            updated_font_size = calc_font_size(xmin, xmax, ymin, ymax,
+                                               "\n".join(realigned_text))
 
             font = ImageFont.truetype(font_path, updated_font_size)
             self._estimated_sizes.append(updated_font_size)
-            draw.text([xmin, ymin], "\n".join(realigned_text),
-                      font=font, fill=(0, 0, 0, 255))
+            draw.text([xmin, ymin],
+                      "\n".join(realigned_text),
+                      font=font,
+                      fill=(0, 0, 0, 255))
 
         return np.asarray(image)
