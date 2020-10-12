@@ -2,7 +2,7 @@ from extract_img_selenium import *
 from bs4 import BeautifulSoup
 import requests as req
 import pandas as pd
-from core.scrapping import extract_img_selenium
+from core.scraping import extract_img_selenium
 import urllib
 
 import os
@@ -45,6 +45,15 @@ def extract_dictionary(element, additional_dict_values: dict = {}):
 
 
 def parse_soup_page(soup, link=""):
+    """
+    gets as many meta features as possible from the page
+    Args:
+        soup:
+        link:
+
+    Returns:
+
+    """
     link = ""
     jp = soup.select("div.main.language")[0]
     eng = soup.select('div.language.sub')[0]
@@ -101,7 +110,7 @@ def get_link(soup):
 
 def extract_manga(link, save_dir="/home/data/bilingual/"):
     all_frames = pd.DataFrame()
-    for i in range(3000):
+    for i in range(3000): #time out if a manga has greater than 3k images in it ((usually around 150 - 200)
         last_link = link
         resp = req.get(link)
         soup = BeautifulSoup(resp.text, 'lxml')

@@ -3,8 +3,12 @@ import time
 
 from PIL import Image
 import os
+import sys
 from sklearn.neighbors import NearestNeighbors
 import pandas as pd
+sys.path.append("../")
+
+from core.scraping import extract_img_selenium
 
 def create_web_driver(path="chromedriver"):
     """
@@ -20,11 +24,52 @@ def create_web_driver(path="chromedriver"):
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('--headless')
-    #chrome_options.add_argument("--window-size=4000,3000")
+    chrome_options.add_argument("--window-size=4000,3000")
     return webdriver.Chrome(
         path,
         options=chrome_options)
 
+def find_next_link(driver):
+    """
+    finds next link to go to for extracting image in manga
+    Args:
+        driver: chromedriver
+
+    Returns:
+
+    """
+    buttons = driver.find_elements_by_class_name("btn-control-container")[0]
+    buttons = buttons.find_elements_by_tag_name("a")
+    if(len(buttons)<2): return []
+    else:
+        return [buttons[1].get_attribute("href")]
+
+
+def save_eng_jp_pairs(driver, link, dir_path, file_id):
+    """
+    saves pairs of japanese and english pairs
+    Args:
+        driver: selenium driver
+        link: link to page
+        dir_path: path to save directory
+        file_id: id of the file being saved
+
+    Returns:
+        None
+    """
+    if os.path.isdir(dir_path) == False:
+        os.mkdir(dir_path)
+
+    driver.get(link)
+    time.sleep(1)
+    path = os.path.join(dir_path, str(file_id))
+
+    element = driver.find_element_by_class_name("image-container")
+
+    save_image(driver, element, path + "_jp.png")
+    driver.find_element_by_id("js-ripple-btn").click()
+    time.sleep(.1)
+    save_image(driver, element, path + "_en.png")
 
 def save_image(driver, html_element, output):
     """
@@ -73,7 +118,7 @@ def align_jp_and_en_boxes(pd_results)->pd.DataFrame:
 
     return japanese_results.append(english_results).reset_index()
 
-def parse_color(key, string):
+def parse_color(key, string)->str:
     """
     parses the color html of form 'rgb(0,0,0)'
     Args:
@@ -81,28 +126,28 @@ def parse_color(key, string):
         string: associated string value in the html
 
     Returns:
-
+        str
     """
     assert key == "color"
     string = string.replace("rgb(", "").replace(")", "").split(", ")
     return string
 
 
-def parse_number(key, string):
+def parse_number(key, string)->float:
     """
     parse numeric values
     Args:
-        key: type of html
+        key: type of html (currently ignored)
         string: a string that represents the font
 
     Returns:
-
+        float
     """
     size = string.split(", ")[0].replace("px", "")
     return float(size)
 
 
-def parse_known(key, val):
+def parse_known(key, val)->str:
     """
     maps string from html to to function for parsing
     Args:
@@ -110,7 +155,7 @@ def parse_known(key, val):
         val: associated value in html
 
     Returns:
-
+        str
     """
     key_to_func = {}
     key_to_func["left"] = parse_number
@@ -125,7 +170,15 @@ def parse_known(key, val):
         return val
 
 
-def extract_dictionary(element):
+def extract_dictionary(element)->dict:
+    """
+    extracts various pairings
+    Args:
+        element:
+
+    Returns:
+        dict
+    """
     all_pairs = []
     index = 0
 
@@ -202,7 +255,7 @@ def save_eng_jp_pairs(driver, link, dir_path, file_id):
 
     driver.get(link)
     time.sleep(1)
-    path = os.path.join(dir_path, file_id)
+    path = os.path.join(dir_path, str(file_id))
 
     element = driver.find_element_by_class_name("image-container")
 

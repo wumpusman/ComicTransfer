@@ -3,6 +3,7 @@ import cv2
 from PIL import Image, ImageFont, ImageDraw 
 import sys
 import os
+sys.path.append("../")
 from core.components.alignment import predict_jp_bounding
 from core.components.translation import predictor_translate
 from core.components.clean import clean_img
@@ -10,14 +11,16 @@ from core.components.assignment import assign_text
 from core.components.assignment import assign_ml
 from core.components import pipeline
 
+
+
 default_image_path:str="../data/temp.png"
 default_font_model_pth="../data/models/font_model.pkl"
 default_bound_model_pth="../data/models/bounding_model.pkl"
 default_font_pth='../data/LiberationMono-Bold.ttf'
-default_save_dir="../data/results/"
-default_project_id="typegan"
+default_save_dir="../data/results_temp"
+default_project_id="typegan" #the one i chose, but you should assign your relevant one
 
-parser = argparse.ArgumentParser(description='sample for running the converter with default')
+parser = argparse.ArgumentParser(description='code for running extraction pipeline for a local image')
 parser.add_argument("-p","--file_path",help="path to a jpg or png",default=default_image_path)
 parser.add_argument("-f","--font_path",help="path to font to be used",default=default_font_pth)
 parser.add_argument("-s","--model_font_size",help="path to model for font size",default=default_font_model_pth)
@@ -38,7 +41,7 @@ def main(project_id:str,image_path:str,destination:str,font_path:str,font_model_
         bound_model_path: model for estimating how bounds of text should be in english
 
     Returns:
-
+        None
     """
 
     assign_obj = assign_ml.load_default_model(font_model_path, bound_model_path)
@@ -51,7 +54,7 @@ def main(project_id:str,image_path:str,destination:str,font_path:str,font_model_
     image_to_draw= Image.fromarray(pipeline_obj._image_overlaid_text)
 
 
-    image_to_draw.save(os.path.join(destination,"img_overlay1.png"))
+    image_to_draw.save(os.path.join(destination,"img_overlay2.png"))
 
 if __name__ == '__main__':
     args = parser.parse_args()

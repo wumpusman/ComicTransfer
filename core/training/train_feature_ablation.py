@@ -1,14 +1,14 @@
 
 import os
 import sys
-sys.path.append("../../")
+sys.path.append("../")
 from core.datahandling import process_bilingual_data
 from core.models import traditional_feature_prediction, iou_prediction
 from sklearn.linear_model import LinearRegression
 import argparse
 
-default_path_tsv= "../../data/bilingual_tsv"
-save_model_path= "../../data/models/bounding_model.pkl"
+default_path_tsv= "../data/bilingual_tsv"
+save_model_path= "../data/models_temp/bounding_model.pkl"
 save_model:bool=True
 run_ablation:bool=False
 model_type:str="bound"
@@ -47,9 +47,8 @@ def main (model_type:str,dir_path,save_path:str="temp.pkl",save_model:bool=False
     all_data = process.output_all_features()
 
     print("training")
-    #["x1_jp","y1_jp","x2_jp","y2_jp","text_jp_len",'left_jp','width_jp','height_jp']
-    x_pd, y_pd, x_names, y_names = None, None, None, None
-    prediction_wrapper = None
+
+
     if model_type=="bound":
         x_pd, y_pd = process.output_all_features_iou()
         x_names = x_pd.columns.values
