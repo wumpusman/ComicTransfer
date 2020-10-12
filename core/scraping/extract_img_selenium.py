@@ -1,14 +1,11 @@
 from selenium import webdriver
 import time
-
 from PIL import Image
 import os
 import sys
 from sklearn.neighbors import NearestNeighbors
 import pandas as pd
-sys.path.append("../")
 
-from core.scraping import extract_img_selenium
 
 def create_web_driver(path="chromedriver"):
     """
@@ -29,6 +26,7 @@ def create_web_driver(path="chromedriver"):
         path,
         options=chrome_options)
 
+
 def find_next_link(driver):
     """
     finds next link to go to for extracting image in manga
@@ -40,7 +38,8 @@ def find_next_link(driver):
     """
     buttons = driver.find_elements_by_class_name("btn-control-container")[0]
     buttons = buttons.find_elements_by_tag_name("a")
-    if(len(buttons)<2): return []
+    if(len(buttons) < 2):
+        return []
     else:
         return [buttons[1].get_attribute("href")]
 
@@ -71,6 +70,7 @@ def save_eng_jp_pairs(driver, link, dir_path, file_id):
     time.sleep(.1)
     save_image(driver, element, path + "_en.png")
 
+
 def save_image(driver, html_element, output):
     """
     save a screen show to the page
@@ -99,14 +99,15 @@ def save_image(driver, html_element, output):
     im.save(output)
 
 
-
-def align_jp_and_en_boxes(pd_results)->pd.DataFrame:
+def align_jp_and_en_boxes(pd_results) -> pd.DataFrame:
     """boxes are not ordered on the page, so heuristically must match them based on
     location on page
     """
 
-    japanese_results = pd.DataFrame.copy(pd_results[pd_results.language == "jp"]).reset_index()
-    english_results = pd.DataFrame.copy(pd_results[pd_results.language == "en"]).reset_index()
+    japanese_results = pd.DataFrame.copy(
+        pd_results[pd_results.language == "jp"]).reset_index()
+    english_results = pd.DataFrame.copy(
+        pd_results[pd_results.language == "en"]).reset_index()
 
     japanese_vals = japanese_results[["left", "top"]].values
     english_vals = english_results[["left", "top"]].values
@@ -118,7 +119,8 @@ def align_jp_and_en_boxes(pd_results)->pd.DataFrame:
 
     return japanese_results.append(english_results).reset_index()
 
-def parse_color(key, string)->str:
+
+def parse_color(key, string) -> str:
     """
     parses the color html of form 'rgb(0,0,0)'
     Args:
@@ -133,7 +135,7 @@ def parse_color(key, string)->str:
     return string
 
 
-def parse_number(key, string)->float:
+def parse_number(key, string) -> float:
     """
     parse numeric values
     Args:
@@ -147,7 +149,7 @@ def parse_number(key, string)->float:
     return float(size)
 
 
-def parse_known(key, val)->str:
+def parse_known(key, val) -> str:
     """
     maps string from html to to function for parsing
     Args:
@@ -170,7 +172,7 @@ def parse_known(key, val)->str:
         return val
 
 
-def extract_dictionary(element)->dict:
+def extract_dictionary(element) -> dict:
     """
     extracts various pairings
     Args:
@@ -194,11 +196,10 @@ def extract_dictionary(element)->dict:
         val = parse_known(key, val)
         dictionary[key] = val
 
-
     return dictionary
 
 
-def save_meta_data_eng_jp_pairs(driver,link):
+def save_meta_data_eng_jp_pairs(driver, link):
     """
     saves aggregate info about image such language and image size
     Args:
@@ -208,23 +209,25 @@ def save_meta_data_eng_jp_pairs(driver,link):
     Returns:
 
     """
-    jp_ones = driver.find_elements_by_class_name("main")[0].find_elements_by_class_name("div-text")
-    en_ones = driver.find_elements_by_class_name("sub")[0].find_elements_by_class_name("div-text")
-    counterJp=0
-    counterEn=0
-    full_list:list=[]
+    jp_ones = driver.find_elements_by_class_name(
+        "main")[0].find_elements_by_class_name("div-text")
+    en_ones = driver.find_elements_by_class_name(
+        "sub")[0].find_elements_by_class_name("div-text")
+    counterJp = 0
+    counterEn = 0
+    full_list: list = []
     for element in jp_ones:
-        primary:dict=extract_dictionary(element)
-        text:str=element.text
-        innerWidth:int=element.size["width"]
-        innerHeight:int=element.size["height"]
+        primary: dict = extract_dictionary(element)
+        text: str = element.text
+        innerWidth: int = element.size["width"]
+        innerHeight: int = element.size["height"]
         primary["language"] = "jp"
         primary["text"] = text
-        primary["innerWidth"]=innerWidth
-        primary["innerHeight"]=innerHeight
-        primary["link"]=link
-        primary["boxID"]=counterJp
-        counterJp+=1
+        primary["innerWidth"] = innerWidth
+        primary["innerHeight"] = innerHeight
+        primary["link"] = link
+        primary["boxID"] = counterJp
+        counterJp += 1
         full_list.append(primary)
 
     driver.find_element_by_id("js-ripple-btn").click()
@@ -243,8 +246,6 @@ def save_meta_data_eng_jp_pairs(driver,link):
         counterEn += 1
         full_list.append(primary)
     return full_list
-
-
 
 
 def save_eng_jp_pairs(driver, link, dir_path, file_id):

@@ -1,13 +1,9 @@
 import sys
-import os
 sys.path.append("../..")
 from core.models.traditional_feature_prediction import FeaturePredictionTraditional
-from core.datahandling.process_bilingual_data import Preprocess_Bilingual
-from core.models import traditional_feature_prediction
-import pandas as pd
 
 
-def get_iou(bb1:dict, bb2:dict)->float:
+def get_iou(bb1: dict, bb2: dict) -> float:
     """
         an implementation of Intersection over union slow - very slightly modified from #todo optimize it
         https://stackoverflow.com/questions/25349178/calculating-percentage-of-bounding-box-overlap-for-image-detector-evaluation
@@ -25,7 +21,7 @@ def get_iou(bb1:dict, bb2:dict)->float:
         assert bb2['x1'] < bb2['x2']
         assert bb2['y1'] < bb2['y2']
     except:
-        return 0 #if predictions are off return failure
+        return 0  # if predictions are off return failure
 
     # determine the coordinates of the intersection rectangle
     x_left = max(bb1['x1'], bb2['x1'])
@@ -52,7 +48,8 @@ def get_iou(bb1:dict, bb2:dict)->float:
     assert iou <= 1.0
     return iou
 
-def get_iou_lists(l1:list,l2:list)->float:
+
+def get_iou_lists(l1: list, l2: list) -> float:
     """
     does iou lists instead of raw components
     Args:
@@ -62,17 +59,13 @@ def get_iou_lists(l1:list,l2:list)->float:
     Returns:
         float
     """
-    bb1 =  {"x1":l1[0],"y1":l1[1],"x2":l1[2],"y2":l1[3]}
-    bb2 =  {"x1": l2[0], "y1": l2[1], "x2": l2[2], "y2": l2[3]}
+    bb1 = {"x1": l1[0], "y1": l1[1], "x2": l1[2], "y2": l1[3]}
+    bb2 = {"x1": l2[0], "y1": l2[1], "x2": l2[2], "y2": l2[3]}
 
-    return get_iou(bb1,bb2)
-
-
-
+    return get_iou(bb1, bb2)
 
 
 class PredictionBoundingTraditional(FeaturePredictionTraditional):
-
 
     def __init__(self):
         """
@@ -82,8 +75,19 @@ class PredictionBoundingTraditional(FeaturePredictionTraditional):
 
         super().__init__()
 
-
-    def set_features(self,x_names:list=["top_jp", "left_jp", "width_jp", "height_jp", "text_jp_len"],y_names:list=['x1_en', 'y1_en', 'x2_en', 'y2_en']):
+    def set_features(
+        self,
+        x_names: list = [
+            "top_jp",
+            "left_jp",
+            "width_jp",
+            "height_jp",
+            "text_jp_len"],
+        y_names: list = [
+            'x1_en',
+            'y1_en',
+            'x2_en',
+            'y2_en']):
         """
         sets features with the one expectation that output y features are x1,y1,x2,y2 format
         Args:
@@ -93,12 +97,9 @@ class PredictionBoundingTraditional(FeaturePredictionTraditional):
         Returns:
             None
         """
-        super().set_features(x_names,y_names)
+        super().set_features(x_names, y_names)
 
-
-
-
-    def score(self,predicted,ground_truth) ->float:
+    def score(self, predicted, ground_truth) -> float:
         """
         score the values based on IOU, how much the two bounding boxes are overlapping
         Args:
@@ -108,18 +109,15 @@ class PredictionBoundingTraditional(FeaturePredictionTraditional):
         Returns:
             float
         """
-        total_score=0
+        total_score = 0
 
-        for y_hat,y in zip(predicted,ground_truth):
+        for y_hat, y in zip(predicted, ground_truth):
 
-            total_score+=get_iou_lists(y_hat,y)
+            total_score += get_iou_lists(y_hat, y)
 
-        return total_score/len(predicted)
+        return total_score / len(predicted)
 
-    def fit(self,x,y,preprocess:bool=False):
+    def fit(self, x, y, preprocess: bool = False):
         if preprocess:
-            x=self.preprocess(x,True)
-        self._model.fit(x,y)
-
-
-
+            x = self.preprocess(x, True)
+        self._model.fit(x, y)

@@ -1,29 +1,53 @@
 
+import argparse
 import os
 import sys
-sys.path.append("../")
-from core.datahandling import process_bilingual_data
-from core.models import traditional_feature_prediction, iou_prediction
 from sklearn.linear_model import LinearRegression
-import argparse
+sys.path.append("../")
+from core.models import traditional_feature_prediction, iou_prediction
+from core.datahandling import process_bilingual_data
 
-default_path_tsv= "../data/bilingual_tsv"
-save_model_path= "../data/models_temp/bounding_model.pkl"
-save_model:bool=True
-run_ablation:bool=False
-model_type:str="bound"
+DEFAULT_PATH_TSV = "../data/bilingual_tsv"
+SAVE_MODEL_PATH = "../data/models_temp/bounding_model.pkl"
+SAVE_MODEL: bool = True
+RUN_ABLATION: bool = False
+MODEL_TYPE: str = "bound"
 
-parser = argparse.ArgumentParser(description='setup for training models, as well as simple ablations')
-parser.add_argument("-d","--datadir",help="path to tsv files",default=default_path_tsv)
-parser.add_argument("-m","--savepath",help="path to save the model",default=save_model_path)
-parser.add_argument("-s","--savemodel",help="save the model",default=save_model)
-parser.add_argument("-a","--ablate",help="run and output simple ablations",default=run_ablation)
-parser.add_argument("-t","--type",help="select 'font' or 'bound' to decide what model to run",default=model_type)
+parser = argparse.ArgumentParser(
+    description='setup for training models, as well as simple ablations')
+parser.add_argument(
+    "-d",
+    "--datadir",
+    help="path to tsv files",
+    default=DEFAULT_PATH_TSV)
+parser.add_argument(
+    "-m",
+    "--savepath",
+    help="path to save the model",
+    default=SAVE_MODEL_PATH)
+parser.add_argument(
+    "-s",
+    "--savemodel",
+    help="save the model",
+    default=SAVE_MODEL)
+parser.add_argument(
+    "-a",
+    "--ablate",
+    help="run and output simple ablations",
+    default=RUN_ABLATION)
+parser.add_argument(
+    "-t",
+    "--type",
+    help="select 'font' or 'bound' to decide what model to run",
+    default=MODEL_TYPE)
 
 
-
-
-def main (model_type:str,dir_path,save_path:str="temp.pkl",save_model:bool=False,run_ablation:bool=False):
+def main(
+        model_type: str,
+        dir_path,
+        save_path: str = "temp.pkl",
+        save_model: bool = False,
+        run_ablation: bool = False):
     """
     runs basic model training, and simple ablation if using non-linear models
     Args:
@@ -48,8 +72,7 @@ def main (model_type:str,dir_path,save_path:str="temp.pkl",save_model:bool=False
 
     print("training")
 
-
-    if model_type=="bound":
+    if model_type == "bound":
         x_pd, y_pd = process.output_all_features_iou()
         x_names = x_pd.columns.values
         y_names = y_pd.columns.values
@@ -58,24 +81,23 @@ def main (model_type:str,dir_path,save_path:str="temp.pkl",save_model:bool=False
         prediction_wrapper = iou_prediction.PredictionBoundingTraditional()
         prediction_wrapper.set_data(all_data)
         prediction_wrapper.set_features(x_names)
-        prediction_wrapper.set_features(x_names,y_names)
+        prediction_wrapper.set_features(x_names, y_names)
 
-    elif model_type=="font":
+    elif model_type == "font":
         x_pd, y_pd = process.output_all_features_font_size()
         x_names = x_pd.columns.values
         y_names = y_pd.columns.values
 
         prediction_wrapper = traditional_feature_prediction.FeaturePredictionTraditional()
         prediction_wrapper.set_data(all_data)
-        prediction_wrapper.set_features(x_names,y_names)
+        prediction_wrapper.set_features(x_names, y_names)
 
     else:
         raise Exception("no known model type specified")
 
-    #MultiOutputRegressor(GradientBoostingRegressor())
+    # MultiOutputRegressor(GradientBoostingRegressor())
     prediction_wrapper.set_model(LinearRegression())
     print(prediction_wrapper.score_cv())
-
 
     if run_ablation:
         for feature in range(len(x_names)):
@@ -87,15 +109,15 @@ def main (model_type:str,dir_path,save_path:str="temp.pkl",save_model:bool=False
 
     if save_model:
 
-        prediction_wrapper.fit(prediction_wrapper._x, prediction_wrapper._y,preprocess=True)
+        prediction_wrapper.fit(
+            prediction_wrapper._x,
+            prediction_wrapper._y,
+            preprocess=True)
         traditional_feature_prediction.save(prediction_wrapper, save_path)
 
 
 if __name__ == '__main__':
 
-
     args = parser.parse_args()
 
-    main(args.type,args.datadir, args.savepath, args.savemodel, args.ablate)
-
-
+    main(args.type, args.datadir, args.savepath, args.savemodel, args.ablate)

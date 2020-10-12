@@ -4,25 +4,25 @@ from google.cloud import automl
 import argparse
 import os
 
-dir_img_path:str=""
-dir_destination_path:str=""
-project_id="hidden"
-model_id="hidden"
+dir_img_path: str = ""
+dir_destination_path: str = ""
+project_id = "hidden"
+model_id = "hidden"
 
-imgs=os.listdir(dir_img_path)
-relevant_images=[os.path.join(dir_img_path,i) for i in imgs if "png" in i]
+imgs = os.listdir(dir_img_path)
+relevant_images = [os.path.join(dir_img_path, i) for i in imgs if "png" in i]
 
 
 prediction_client = automl.PredictionServiceClient()
-project_id="hidden"
-model_id="hidden"
+project_id = "hidden"
+model_id = "hidden"
 
 # Get the full path of the model.
 model_full_id = automl.AutoMlClient.model_path(
     project_id, "us-central1", model_id
 )
 
-file_path="../../data/005.png"
+file_path = "../../data/005.png"
 with open(file_path, "rb") as content_file:
     content = content_file.read()
 

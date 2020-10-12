@@ -8,6 +8,7 @@ import io
 import PIL.Image as Image
 import cv2
 
+
 class PipeComponents():
     """
     Attributes:
@@ -24,32 +25,31 @@ class PipeComponents():
         _ran_once: did this system go through dataset at least once
 
     """
-    def __init__(self,project_id="typegan",font_path:str=""):
+
+    def __init__(self, project_id="typegan", font_path: str = ""):
         """
         pipeline that is meant to encapsulate the different aspects of the current system
         Args:
             project_id: id used for project certification
             font_path: path to a specific font to be rendered, default is rooted to linux path
         """
-        self._default_font_path=font_path
-        self.extract_boundary_obj=predict_jp_bounding.BoundingGoogle()
-        self.clean_img_obj=clean_img.CleanDefault()
-        self.translate_obj=predictor_translate.TranslationGoogle(project_id)
-        self.assign_obj=assign_ml.AssignTextML()
+        self._default_font_path = font_path
+        self.extract_boundary_obj = predict_jp_bounding.BoundingGoogle()
+        self.clean_img_obj = clean_img.CleanDefault()
+        self.translate_obj = predictor_translate.TranslationGoogle(project_id)
+        self.assign_obj = assign_ml.AssignTextML()
 
-        self._image_unprocessed=None
-        self._image_cleaned=None #original image removed
-        self._data_estimates=None #font predictions and text assignment estimates if they exist
-        self._image_text_mask=None #image with just the text in the estimated location
-        self._image_overlaid_text=None #image with text overlaid on it
+        self._image_unprocessed = None
+        self._image_cleaned = None  # original image removed
+        # font predictions and text assignment estimates if they exist
+        self._data_estimates = None
+        self._image_text_mask = None  # image with just the text in the estimated location
+        self._image_overlaid_text = None  # image with text overlaid on it
         self._ran_once = False  # did it run once
         if font_path == "":
-            self._default_font_path= '../../data/LiberationMono-Bold.ttf'
+            self._default_font_path = '../../data/LiberationMono-Bold.ttf'
 
-
-
-
-    def set_boundary_estimate_model(self,model):
+    def set_boundary_estimate_model(self, model):
         """
         sets boundary object
         Args:
@@ -58,8 +58,9 @@ class PipeComponents():
             None
 
         """
-        self.extract_boundary_obj=model
-    def set_clean_model(self,model):
+        self.extract_boundary_obj = model
+
+    def set_clean_model(self, model):
         """
         sets clean object
         Args:
@@ -68,8 +69,9 @@ class PipeComponents():
             None
 
         """
-        self.clean_img_obj=model
-    def set_translate_model(self,model):
+        self.clean_img_obj = model
+
+    def set_translate_model(self, model):
         """
         sets translate object
         Args:
@@ -78,8 +80,9 @@ class PipeComponents():
             None
 
         """
-        self.translate_obj=model
-    def set_assignment_model(self,model):
+        self.translate_obj = model
+
+    def set_assignment_model(self, model):
         """
         sets assignment object
         Args:
@@ -88,9 +91,9 @@ class PipeComponents():
             None
 
         """
-        self.assign_obj=model
+        self.assign_obj = model
 
-    def has_run(self)->bool:
+    def has_run(self) -> bool:
         """
         returns if pipeline has run at least once
         Returns:
@@ -104,14 +107,17 @@ class PipeComponents():
         Returns:
             None
         """
-        self._ran_once=False
-        self._image_unprocessed=None
-        self._image_cleaned=None
-        self._data_estimates=None
-        self._image_text_mask=None
-        self._image_overlaid_text=None
+        self._ran_once = False
+        self._image_unprocessed = None
+        self._image_cleaned = None
+        self._data_estimates = None
+        self._image_text_mask = None
+        self._image_overlaid_text = None
 
-    def calculate_results_from_path(self,img_path:str,original_text:list=[]):
+    def calculate_results_from_path(
+            self,
+            img_path: str,
+            original_text: list = []):
         """
         calculates results of pipeline based on an image path and optional associated transcript
         results are stored internally
@@ -126,10 +132,9 @@ class PipeComponents():
         with io.open(img_path, 'rb') as image_file:
             content = image_file
 
-            self.calculate_results(content,original_text)
+            self.calculate_results(content, original_text)
 
-
-    def calculate_results(self,bytestream, original_text:list=[]):
+    def calculate_results(self, bytestream, original_text: list = []):
         """ calculates results of pipeline based on an image bytestream and optional associated transcript
         results are stored internally
 
@@ -140,48 +145,37 @@ class PipeComponents():
         Returns:
             None
         """
-        self.clear_prev_estimates() ## clear results
-        results_bounds_ocr:dict=self.extract_boundary_obj.predict_byte(bytestream)
-        formatted_bounds_ocr:pd.DataFrame=self.extract_boundary_obj.format_predictions(results_bounds_ocr)
+        self.clear_prev_estimates()  # clear results
+        results_bounds_ocr: dict = self.extract_boundary_obj.predict_byte(
+            bytestream)
+        formatted_bounds_ocr: pd.DataFrame = self.extract_boundary_obj.format_predictions(
+            results_bounds_ocr)
 
-        original_jp_text:list=formatted_bounds_ocr["text_jp"]
-        translation_en=self.translate_obj.predict(original_jp_text)
+        original_jp_text: list = formatted_bounds_ocr["text_jp"]
+        translation_en = self.translate_obj.predict(original_jp_text)
 
         image = Image.open(bytestream)
         self._image_unprocessed = np.copy(np.asarray(image))
-        self._image_cleaned=self.clean_img_obj.clean(np.copy(self._image_unprocessed),results_bounds_ocr["vertices"])
+        self._image_cleaned = self.clean_img_obj.clean(
+            np.copy(self._image_unprocessed), results_bounds_ocr["vertices"])
 
-        self._image_text_mask=np.copy(np.asarray(self._image_cleaned))
-        self._image_text_mask[:,:,:]=0
-        self._image_text_mask=self.assign_obj.assign_all(self._image_text_mask,
-                                                             translation_en,formatted_bounds_ocr,
-                                                             self._default_font_path)
+        self._image_text_mask = np.copy(np.asarray(self._image_cleaned))
+        self._image_text_mask[:, :, :] = 0
+        self._image_text_mask = self.assign_obj.assign_all(
+            self._image_text_mask,
+            translation_en,
+            formatted_bounds_ocr,
+            self._default_font_path)
 
-        self._image_overlaid_text=self.assign_obj.assign_all(self._image_cleaned,
-                                                             translation_en,formatted_bounds_ocr,
-                                                             self._default_font_path)
+        self._image_overlaid_text = self.assign_obj.assign_all(
+            self._image_cleaned,
+            translation_en,
+            formatted_bounds_ocr,
+            self._default_font_path)
 
-        self._data_estimates=pd.DataFrame()
-        self._data_estimates["jp_text"]=original_jp_text
-        self._data_estimates["en_trans"]=translation_en
-        self._data_estimates["font_prediction"]=self.assign_obj.get_estimate_font_size()
-        self._ran_once=True
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        self._data_estimates = pd.DataFrame()
+        self._data_estimates["jp_text"] = original_jp_text
+        self._data_estimates["en_trans"] = translation_en
+        self._data_estimates["font_prediction"] = self.assign_obj.get_estimate_font_size(
+        )
+        self._ran_once = True
