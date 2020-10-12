@@ -2,7 +2,6 @@ data/*
 data2/*
 chicken_scratch/
 __pycache__/
-!data2/temp.txt
 *.pkl
 *.csv
 model-outputs
@@ -15,6 +14,9 @@ model-outputs
 !data/temp.png
 !sample_data.tsv
 !data/LiberationMono-Bold.ttf
+!data/manga_list.txt
+!data/models_temp/bounding_model.pkl
+!data/models_temp/font_model.pkl
 notebooks/
 *.ipynb_checkpoints
 .ipynb_checkpoints/*
