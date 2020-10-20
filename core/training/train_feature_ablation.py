@@ -6,7 +6,7 @@ sys.path.append("../")
 from core.models import traditional_feature_prediction, iou_prediction
 from core.datahandling import process_bilingual_data
 
-DEFAULT_PATH_TSV = "../data/bilingual_tsv"
+DEFAULT_PATH_TSV = "../../data/bilingual_tsv"
 SAVE_MODEL_PATH = "../data/models_temp/bounding_model.pkl"
 SAVE_MODEL: bool = True
 RUN_ABLATION: bool = False
