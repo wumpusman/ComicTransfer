@@ -17,6 +17,7 @@ model-outputs
 !data/temp.png
 !sample_data.tsv
 !data/LiberationMono-Bold.ttf
+!/data/sample_train/sample_data.tsv
 !data/manga_list.txt
 !data/sample_data.tsv
 !data/models/
