@@ -21,7 +21,10 @@ model-outputs
 !data/models/
 !data/models/bounding_model.pkl
 !data/models/font_model.pkl
-!data/craft_temp/temp_train/
+!data/craft_temp/temp_train/4_en.png
+!data/craft_temp/temp_train/4_jp.png
+!data/craft_temp/temp_train/5_en.png
+!data/craft_temp/temp_train/5_jp.png
 notebooks/
 *.ipynb_checkpoints
 .ipynb_checkpoints/*
