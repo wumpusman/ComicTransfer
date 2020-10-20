@@ -1,9 +1,8 @@
-from extract_img_selenium import *
 from bs4 import BeautifulSoup
 import requests as req
 import pandas as pd
-from core.scraping import extract_img_selenium
 import urllib
+from core.scraping import extract_img_selenium
 
 import os
 import time
@@ -29,7 +28,7 @@ def extract_dictionary(element, additional_dict_values: dict = {}):
         for element in attribute_elements:
 
             pair = element.split(":")
-            if len(pair)!=2:
+            if len(pair) != 2:
                 continue
             key = pair[0]
             val = pair[1]
@@ -65,13 +64,16 @@ def parse_soup_page(soup, link=""):
     jpg = img_link.attrs["src"]
 
     manga = soup.findAll(False, {'id': ["manga-name"]})[0]
-    manga = manga.text.replace(" ", "_").replace("?","").replace(":","")
+    manga = manga.text.replace(" ", "_").replace("?", "").replace(":", "")
     print(manga)
 
     jp_dict = {}
     eng_dict = {}
 
-    eng_dict = extract_dictionary(eng_text, {"language": "english", "manga": manga})
+    eng_dict = extract_dictionary(eng_text, {
+        "language": "english",
+        "manga": manga
+    })
 
     jp_dict = extract_dictionary(jp_text, {"language": "jp", "manga": manga})
 
@@ -110,20 +112,22 @@ def get_link(soup):
 
 def extract_manga(link, save_dir="/home/data/bilingual/"):
     all_frames = pd.DataFrame()
-    for i in range(3000): #time out if a manga has greater than 3k images in it ((usually around 150 - 200)
+    for i in range(
+            3000
+    ):  # time out if a manga has greater than 3k images in it ((usually around 150 - 200)
         last_link = link
         resp = req.get(link)
         soup = BeautifulSoup(resp.text, 'lxml')
 
         link = get_link(soup)  # link to next page
-        if link =="":
+        if link == "":
             break
         time.sleep(1)
         frame = []
         try:
             frame = parse_soup_page(soup, link)
 
-        except:
+        except BaseException:
             pass
 
         link = "https://bilingualmanga.com/" + link

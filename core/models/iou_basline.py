@@ -1,7 +1,7 @@
 from core.models import iou_prediction
 
-class PredictionBoundingBaseline(iou_prediction.PredictionBoundingTraditional):
 
+class PredictionBoundingBaseline(iou_prediction.PredictionBoundingTraditional):
     def __init__(self):
         """Overlays the JP bounding box onto the english one with no modeling
         """
