@@ -50,16 +50,16 @@ dependencies
     
     example usage:
     '''
-    python main.py -p ../data/temp.png -o ../data/results_temp/ --model_font_size ../data/models/font_model.pkl
+    python main.py -p ../data/temp.png -o ../data/ --model_font_size ../data/models/font_model.pkl
     '''
     
 ### Retraining Models
     cd /core
     python training/train_feature_ablation.py 
-    
+  
     example usage:
     '''
-    python  training/train_feature_ablation.py -d ../data/bilingual_tsv --savepath  ../data/models_temp/bounding_model2.pkl --savemodel True --type font
+    python  training/train_feature_ablation.py -d ../data/sample_train --savepath  ../data/models_temp/bounding_model2.pkl --savemodel True --type font
     '''
 
 ### Recollecting Data
