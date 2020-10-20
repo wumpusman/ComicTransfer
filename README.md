@@ -10,7 +10,7 @@ Specifically this project focuses on automatically realigning text and positioni
 with inclusion, but with limited functionality for optional cleaning, and translation.
 
 ## Prerequisites
-Currently, for core inference (/core/main.py and app.py), this project has several requirements that are google cloud API dependent, and is expected to
+Currently, for core inference (core/main.py and app.py), this project has several requirements that are google cloud API dependent, and is expected to
 be embedded in a google compute instance. This requirements include access to google vision api, and google translate api. 
 For setup: [UI setup](https://cloud.google.com/compute/docs/quickstart-linux) , 
 [Interfacing](https://cloud.google.com/compute/docs/ssh-in-browser)
