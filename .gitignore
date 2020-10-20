@@ -2,6 +2,7 @@ data/*
 data2/*
 chicken_scratch/
 __pycache__/
+*.log
 *.pkl
 *.csv
 model-outputs

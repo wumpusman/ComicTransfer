@@ -13,6 +13,8 @@ from core.training.deepnn.train_wrappers import  TrainModel
 from core.datahandling.datahandler_img import DatasetImgCraftDefault
 
 from core.models.deepnn import craft_with_coord
+
+@deprecated(version='1.0.0', reason="this method is currently be transferred from notebooks, but will be removed and modularized in the future")
 def main ():
 
     DIR="../data/craft_temp/"
