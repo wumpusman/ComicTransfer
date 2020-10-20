@@ -2,6 +2,8 @@
 A pipeline for quick positioning and font realignment for Japanese Mangas to English. This additionally has 
 functionality for translation.
 
+![](https://github.com/wumpusman/ComicTransfer/blob/experimental/gif_project.gif)
+
 ## Motivation
 The process of editing mangas between languages is a cumbersome process 
 that takes hours, and is primarily done manually.
