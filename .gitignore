@@ -16,9 +16,10 @@ model-outputs
 !data/LiberationMono-Bold.ttf
 !data/manga_list.txt
 !data/sample_data.tsv
-!data/models_temp/
-!data/models_temp/bounding_model.pkl
-!data/models_temp/font_model.pkl
+!data/models/
+!data/models/bounding_model.pkl
+!data/models/font_model.pkl
+!data/craft_temp/temp_train/
 notebooks/
 *.ipynb_checkpoints
 .ipynb_checkpoints/*

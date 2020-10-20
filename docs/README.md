@@ -1,4 +1,24 @@
+## Directory Outline
 
+    |-- core 
+    |   |-- components
+    |   |   |-- alignment
+    |   |   |-- assignment
+    |   |   |-- clean
+    |   |   |-- translation
+    |   |-- datahandling
+    |   |-- models
+    |   |   |-- deepnn
+    |   |-- scraping
+    |   |-- training
+    |       |-- deepnn
+    |-- data
+    |-- docs
+    |-- tests
+        |-- core
+            |-- components
+            |-- datahandling
+            |-- models
 
 ## Files And Directories
     app.py: Primary streamlit app interface - streamlit run app.py
