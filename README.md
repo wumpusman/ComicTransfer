@@ -35,7 +35,7 @@ dependencies
 ## Running
 
 ### Run Streamlit App
-<b> See prequisites <b>
+**See prerequisites**
 
     streamlit run app.py
     optional: Docker build
@@ -43,7 +43,7 @@ dependencies
     docker run -p 8501:8501 mangnfiy-streamlit:v1
 
 ### Run via main
-<b> See prequisites <b>
+**See prerequisites**
 
     cd /core
     python main.py 

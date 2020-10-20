@@ -24,14 +24,14 @@
     app.py: Primary streamlit app interface - streamlit run app.py
     
     data/: A folder containing temporary data files, fonts and models for tests
-    data/results_temp/: A folder for sample results such as image outputs
-    data/models/: A folder that includes sample models for font and bounding predictions
+    data/craft_text: a folder that includes sample training data and outputs for more experimental deepnn models
+    data/models/: a folder that includes sample models for font and bounding predictions
     
     core/: primary location of functionality for training, models, inference, scraping, etc.
     core/main.py: contains method for running image processing and analysis independent of the app
      
-    core/components: Components pertaining to full pipeline of inference (box detection, cleaning, ocr, translation, reassignment)
-    core/components/pipeline.py: A class for handling processing of image and text data and outputs various results for inference
+    core/components: components pertaining to full pipeline of inference (box detection, cleaning, ocr, translation, reassignment)
+    core/components/pipeline.py: a class for handling processing of image and text data and outputs various results for inference
     
     core/components/alignment: objects for extracting box area, intended to be expandable to handle different models
     core/components/alignment/predict_jp_bounding.py: Contains classes for extracting the japanese bonuding box, and ocr, currently uses google vision api
