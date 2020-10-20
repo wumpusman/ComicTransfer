@@ -30,17 +30,20 @@ dependencies
     git clone https://github.com/wumpusman/ComicTransfer
     cd ./ComicTransfer
     pip install -r requirements.txt
-<br>
+<br><br>
 
 ## Running
 
 ### Run Streamlit App
+<b> See prequisites <b>
+
     streamlit run app.py
     optional: Docker build
     docker build -t mangnify-streamlit:v1 -f dockerfile.app .
     docker run -p 8501:8501 mangnfiy-streamlit:v1
 
 ### Run via main
+<b> See prequisites <b>
 
     cd /core
     python main.py 
