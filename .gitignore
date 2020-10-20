@@ -11,6 +11,8 @@ model-outputs
 *.png
 *.jpg
 *.jpeg
+!requirements.txt
+!requirements_docker.txt
 !data/temp.png
 !sample_data.tsv
 !data/LiberationMono-Bold.ttf
