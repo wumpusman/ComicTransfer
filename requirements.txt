@@ -123,7 +123,7 @@ typed-ast==1.4.1
 typing-extensions==3.7.4.3
 typing-inspect==0.6.0
 tzlocal==2.1
-urllib3==1.25.10
+urllib3==1.26.5
 validators==0.18.1
 watchdog==0.10.3
 wcwidth==0.2.5
